@@ -11,7 +11,7 @@ import inventory.lang.InventoryApp;
  */
 public class GUI {
 	
-	private JFileChooser fileLoader;
+	private JFileChooser fileLoader;	//	File loading
 	
 	
 	/**

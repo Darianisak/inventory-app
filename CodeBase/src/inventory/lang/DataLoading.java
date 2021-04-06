@@ -11,10 +11,12 @@ import java.util.*;
  */
 public class DataLoading {
 
-	private final String expectedInvSchema = 
-			"category	itemName	size	bestBefore";
-	private final int invSchemaCount = 4;
-	private boolean schemaChecked = false;
+	private final String expectedInvSchema = 				//	Valid schema for
+			"category	itemName	size	bestBefore";	//	inv files
+	private final int invSchemaCount = 4;	//	Amount of cols in a valid inv 
+											//	file schema
+	private boolean schemaChecked = false;	//	Flag if the inv files schema has
+											//	been checked
 	
 	/**
 	 * Constructor method for dataLoading - calls a 'main' method
@@ -31,18 +33,12 @@ public class DataLoading {
 	private void readData(File inven)	{
 		try	(FileReader invenReader = new FileReader(inven))	{
 			//	Path of propagation thru which dataLoading operates
-			createItems(invenReader);
+			ArrayList<Item> file = createItems(invenReader);
 		}	catch	(IOException e) {
 			System.out.println("Exception thrown in DataLoading");
 			e.printStackTrace();
 		}
 	}
-	
-	//	Buffered reader gets a line
-	//	checks schema is valid
-	//	line has four elements delimd by tabs
-	//	a line creates an item object
-	//	objects are returned
 	
 	/**
 	 * Method converts an inventory file into a list of usable Item objects
@@ -51,7 +47,7 @@ public class DataLoading {
 	 * @param fileRead
 	 * @return
 	 */
-	private List<Item> createItems(FileReader fileRead) throws IOException	{
+	private ArrayList<Item> createItems(FileReader fileRead) throws IOException	{
 		ArrayList<Item> returnArr = new ArrayList<Item>();
 		try	(BufferedReader readObj = new BufferedReader(fileRead))	{
 			String tempStr = "";
@@ -64,15 +60,16 @@ public class DataLoading {
 					if	(!this.schemaChecked) throw new IOException();
 				}	else	{
 					//	First operation is line two
-					lineToItem(tempStr);
+					Item temp = lineToItem(tempStr);
+					if	(!temp.getCat().equals("-1") && temp.getBB().getValidFlag())	
+						returnArr.add(temp);	
 				}
 			}
 		}	catch(IOException e)	{
 			System.out.println("Error occured in dataLoading.createItems(FileReader)");
 			e.printStackTrace();
 		}
-		
-		
+		System.out.println(returnArr);
 		return returnArr;
 	}
 	
@@ -101,23 +98,26 @@ public class DataLoading {
 	 * @return
 	 */
 	private Item lineToItem(String tempStr)	{
-		//	Local vars
-		int counter = 0;
-		String[] values = {" "};
+		ArrayList<String> info = new ArrayList<String>();
 		Scanner lineScanner = new Scanner(tempStr);
+		//	File fields are delimited via tab chars
 		lineScanner.useDelimiter("\\t");
+		
 		//	Reads the current line into a string array, which is used to create
 		//	the final object. If the row elements exceeds schema defined amount
 		//	returns meangingless value for later sanitization
+
 		while	(lineScanner.hasNext()) {
-			if	(counter == this.invSchemaCount) 
-				return new Item("-1", "", "", "");
-			System.out.println("line: " + lineScanner.next());
-			values[counter] = lineScanner.next();
-			counter++;
+			info.add(lineScanner.next());
 		}
-		return new Item("-1", "", "", "");
+		lineScanner.close();
 		
+		//	Generates return item
+		if	(info.size() != this.invSchemaCount)	{
+			return new Item("-1", "", "", "");
+		}	else	{
+			return new Item(info.get(0), info.get(1), info.get(2), info.get(3));
+		}
 	}
 	
 	//**  **  **  **  **//

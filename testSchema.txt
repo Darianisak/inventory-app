@@ -1,2 +1,6 @@
 category	itemName	size	bestBefore
-Food	Blue Bird Ready Salted Chips	500 Grams	06 06 2021
+Food	Blue Bird Ready Salted Chips	500 Grams	06 07 2021
+valid	bb	0xF00	13 12 2021
+valid	bb	0xF00	12 13 2021
+invalid	bb	0xF00	13 13 2021
+Invalid	bb	0xF00	30 02 2021

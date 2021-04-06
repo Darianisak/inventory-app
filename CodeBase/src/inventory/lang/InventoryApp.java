@@ -10,7 +10,7 @@ import inventory.lang.DataLoading;
  */
 public class InventoryApp {
 	
-	private File inventoryFile;
+	private File inventoryFile;	//	The file path of the inventory file
 
 	/**
 	 * Main method for running the application
@@ -29,6 +29,5 @@ public class InventoryApp {
 	public void doLoading(File invenFile)	{
 		this.inventoryFile = invenFile;
 		new DataLoading(invenFile);
-		
 	}
 }

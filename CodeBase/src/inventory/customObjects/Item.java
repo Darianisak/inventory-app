@@ -9,11 +9,10 @@ import java.util.Calendar;
  */
 public class Item {
 
-	private String category;
-	private String itemName;
-	private String quantity;
-	private String bestBeforeTemp;
-	private Calendar bestBefore;
+	private String category;	//	Category of current item
+	private String itemName;	//	Current items name
+	private String quantity;	//	Amount contained within current item
+	private Date bestBefore;	//	Expirey date of current item
 	
 	/**
 	 * Constructor method for pantry/fridge item
@@ -26,8 +25,24 @@ public class Item {
 		this.category = cat;
 		this.itemName = name;
 		this.quantity = amount;
-		this.bestBeforeTemp = bBefore;
-		//	TODO make call to calendar constructor
+		this.bestBefore = new Date(bBefore);
+	}
+	
+	/**
+	 * Getter for accessing an items category. A category of -1 is an
+	 * invalid item code
+	 * @return
+	 */
+	public String getCat()	{
+		return this.category;
+	}
+	
+	/**
+	 * Getter for accessing an items bestBefore date field
+	 * @return
+	 */
+	public Date getBB()	{
+		return this.bestBefore;
 	}
 	
 	@Override
