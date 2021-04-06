@@ -13,47 +13,30 @@ public class DataLoading {
 
 	private final String expectedInvSchema = 
 			"category	itemName	size	bestBefore";
+	private final int invSchemaCount = 4;
 	private boolean schemaChecked = false;
 	
 	/**
-	 * 'Main' method for dataLoading
+	 * Constructor method for dataLoading - calls a 'main' method
 	 * @param invenFile
 	 */
 	public DataLoading(File invenFile)	{
-		FileReader readObj = createReader(invenFile);
-		if	(readObj == null) throw new NullPointerException();
-		else	doLoading(readObj);
+		readData(invenFile);
 	}
 	
 	/**
-	 * Adds more testing control to process of loading
-	 * @param reader
+	 * Effectively the main method for the DataLoading class
+	 * @param inven
 	 */
-	private void doLoading(FileReader reader)	{
-		try {
-			createItems(reader);
-		} catch (IOException e) {
-			System.out.println("An IOException was thrown; possibly invalid" +
-							" file schema used");
-			e.printStackTrace();
-		}	
-	}
-	
-	/**
-	 * Getter for generating a FileReader Object
-	 * @param inputFile
-	 * @return
-	 */
-	private FileReader createReader(File inputFile)	{
-		try	(FileReader retReader = new FileReader(inputFile);){
-			return retReader;
-		}	catch (IOException e) {
-			System.out.println("Error occured in dataLoading.createReader(File)");
+	private void readData(File inven)	{
+		try	(FileReader invenReader = new FileReader(inven))	{
+			//	Path of propagation thru which dataLoading operates
+			createItems(invenReader);
+		}	catch	(IOException e) {
+			System.out.println("Exception thrown in DataLoading");
 			e.printStackTrace();
 		}
-		return null;
 	}
-	
 	
 	//	Buffered reader gets a line
 	//	checks schema is valid
@@ -69,28 +52,28 @@ public class DataLoading {
 	 * @return
 	 */
 	private List<Item> createItems(FileReader fileRead) throws IOException	{
-		try	(BufferedReader readObj = new BufferedReader(fileRead)){
+		ArrayList<Item> returnArr = new ArrayList<Item>();
+		try	(BufferedReader readObj = new BufferedReader(fileRead))	{
 			String tempStr = "";
 			//	Assignment statement mixed with a conditional
 			while	((tempStr = readObj.readLine()) != null)	{
-				//	Checks file schema is valid, else branch is standard run
-				//	TODO refactor this, no field should be needed
+				//Checks file schema is valid, else branch is standard run
 				if (!this.schemaChecked)	{
-					schemaCheck(tempStr, this.expectedInvSchema);
+					this.schemaChecked = schemaCheck(tempStr, this.expectedInvSchema);
 					//	Checks if it was valid, else throws IOException
-					if	(this.schemaChecked) continue;
-					else	throw new IOException();
+					if	(!this.schemaChecked) throw new IOException();
 				}	else	{
-					
+					//	First operation is line two
+					lineToItem(tempStr);
 				}
 			}
-			
-			
 		}	catch(IOException e)	{
 			System.out.println("Error occured in dataLoading.createItems(FileReader)");
 			e.printStackTrace();
 		}
-		return new ArrayList<Item>();
+		
+		
+		return returnArr;
 	}
 	
 	/**
@@ -101,13 +84,40 @@ public class DataLoading {
 	 */
 	private boolean schemaCheck(String schema, String expected) {
 		if	(schema.equals(expected))	{
-			this.schemaChecked = true;
 			return true;
 		}
 		else {
 			System.out.println("Invalid file schema IOException");
 			return false;	
 		}
+	}
+	
+	/**
+	 * Creates an Item object from a given file string
+	 * If a line has more values than this.invSchemaCount
+	 * returns a predefined meaningless Item value which can be cleared
+	 * from the data after the fact
+	 * @param tempStr
+	 * @return
+	 */
+	private Item lineToItem(String tempStr)	{
+		//	Local vars
+		int counter = 0;
+		String[] values = {" "};
+		Scanner lineScanner = new Scanner(tempStr);
+		lineScanner.useDelimiter("\\t");
+		//	Reads the current line into a string array, which is used to create
+		//	the final object. If the row elements exceeds schema defined amount
+		//	returns meangingless value for later sanitization
+		while	(lineScanner.hasNext()) {
+			if	(counter == this.invSchemaCount) 
+				return new Item("-1", "", "", "");
+			System.out.println("line: " + lineScanner.next());
+			values[counter] = lineScanner.next();
+			counter++;
+		}
+		return new Item("-1", "", "", "");
+		
 	}
 	
 	//**  **  **  **  **//

@@ -12,6 +12,7 @@ public class Item {
 	private String category;
 	private String itemName;
 	private String quantity;
+	private String bestBeforeTemp;
 	private Calendar bestBefore;
 	
 	/**
@@ -21,11 +22,12 @@ public class Item {
 	 * @param amount
 	 * @param bBefore
 	 */
-	public Item(String cat, String name, String amount, Calendar bBefore) {
+	public Item(String cat, String name, String amount, String bBefore) {
 		this.category = cat;
 		this.itemName = name;
 		this.quantity = amount;
-		this.bestBefore = bBefore;
+		this.bestBeforeTemp = bBefore;
+		//	TODO make call to calendar constructor
 	}
 	
 	@Override
