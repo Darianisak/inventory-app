@@ -7,7 +7,7 @@ import java.util.Calendar;
  * Class represents an object found within the pantry
  *	TODO make this generic or something
  */
-public class item {
+public class Item {
 
 	private String category;
 	private String itemName;
@@ -21,7 +21,7 @@ public class item {
 	 * @param amount
 	 * @param bBefore
 	 */
-	public item(String cat, String name, String amount, Calendar bBefore) {
+	public Item(String cat, String name, String amount, Calendar bBefore) {
 		this.category = cat;
 		this.itemName = name;
 		this.quantity = amount;
@@ -53,7 +53,7 @@ public class item {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		item other = (item) obj;
+		Item other = (Item) obj;
 		if (bestBefore == null) {
 			if (other.bestBefore != null)
 				return false;

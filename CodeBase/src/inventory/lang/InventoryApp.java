@@ -2,7 +2,7 @@ package inventory.lang;
 import java.io.File;
 
 import inventory.gui.GUI;
-import inventory.lang.dataLoading;
+import inventory.lang.DataLoading;
 
 /**
  * @author darianisak
@@ -28,6 +28,7 @@ public class InventoryApp {
 	 */
 	public void doLoading(File invenFile)	{
 		this.inventoryFile = invenFile;
-		new dataLoading(invenFile);
+		new DataLoading(invenFile);
+		
 	}
 }
