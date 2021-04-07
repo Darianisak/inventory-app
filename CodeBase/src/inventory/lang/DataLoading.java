@@ -129,7 +129,7 @@ public class DataLoading {
 	 * Polymoprphic constructor used for testing
 	 */
 	public DataLoading()	{
-		System.out.println("This constructor is for testing purposes only");
+		System.out.println("This constructor, DataLoading(), is for testing purposes only");
 	}
 	
 	public boolean test_accessSchemaCheck(String actual, String valid)	{

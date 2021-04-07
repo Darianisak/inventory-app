@@ -1,7 +1,5 @@
 package inventory.customObjects;
 
-import java.util.Calendar;
-
 /**
  * @author darianisak
  * Class represents an object found within the pantry

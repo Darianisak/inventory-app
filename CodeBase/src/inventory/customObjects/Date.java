@@ -5,7 +5,10 @@ import java.util.*;
  * Custom 'calendar' method with simple compareTo implements
  * Allows for the comparison of best before dates of Item objects
  * @author darianisak
- *
+ * 
+ * I was not aware of a java.util Date class prior to writing this class,
+ * All references to Date within this program use this custom implementation,
+ * not the java.util version
  */
 public class Date implements Comparable<Date>{
 
@@ -159,11 +162,32 @@ public class Date implements Comparable<Date>{
 	}
 	
 	@Override
+	/**
+	 * compareTo method override. A return of 0 means the two dates are
+	 * equal, a return of -1 means this is sooner than o, while a return of
+	 * 1 means that o is sooner than this
+	 * A sooner date will have a lower number
+	 */
 	public int compareTo(Date o) {
-		//	0 means equal
-		// -1 means this is less than o
-		// 1 means this is greater than o
-		return 0;
+		if	(this.year != o.year)	{
+			//	If current year is sooner, return -1, otherwise 1
+			return (this.year < o.year) ? -1 : 1;
+		}	else	{
+			//	Same year branch
+			if	(this.month != o.month)	{
+				//	If current month is sooner, return -1, else 1
+				return (this.month < o.month) ? -1 : 1;
+			}	else	{
+				//	Same month branch
+				if	(this.day != o.day)	{
+					//	If current day sooner, return -1, else 1
+					return	(this.day < o.day) ? -1 : 1;
+				}	else	{
+					//	same day branch
+					return 0;
+				}
+			}
+		}
 	}
 	
 	@Override
@@ -194,5 +218,33 @@ public class Date implements Comparable<Date>{
 		if (year != other.year)
 			return false;
 		return true;
+	}
+	
+	//**  **  **  **  **//
+	
+	//	Following code is an assortment of getters used for JUnit tests
+	//	This is not to be used for any purpose besides testing
+	
+	/**
+	 * Polymorphic constructor used for testing
+	 * @param day
+	 * @param month
+	 * @param year
+	 */
+	public Date(int day, int month, int year)	{
+		System.out.println("This constructor, Date(int, int, int) should " +
+				"be used for testing only");
+		this.textDate = day + " " + month + " " + year;
+		this.day = day;
+		this.month = month;
+		this.year = year;
+		monthDayMapping();
+	}
+	
+	/**
+	 * Public getter to access validDateMonth() for testing purposes
+	 */
+	public boolean validGetter()	{
+		return validDateMonth();
 	}
 }
