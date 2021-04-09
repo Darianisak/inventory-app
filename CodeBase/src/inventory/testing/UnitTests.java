@@ -98,7 +98,7 @@ public class UnitTests {
 		assertTrue(returnVal == 1);
 	}
 	@Test
-	public void test10_compareTo_wildCardSooner_years()	{
+	public void test42_compareTo_wildCardSooner_years()	{
 		Date later = new Date(31, 10, 2050);
 		Date sooner = new Date(31, 5, 2000);
 		int returnVal = sooner.compareTo(later);
@@ -183,8 +183,143 @@ public class UnitTests {
 	}
 	@Test
 	public void test22_validDateMonth_validLeap()	{
-		//Date dateObj = news
+		Date dateObj = new Date(29, 2, 2020);
+		assertTrue(dateObj.validGetter());
+	}
+	@Test
+	public void test23_validDateMonth_validLeap02()	{
+		Date dateObj = new Date(1, 3, 2020);
+		assertTrue(dateObj.validGetter());
+	}
+	@Test
+	public void test24_validDateMonth_nonValidLeap()	{
+		Date dateObj = new Date(30, 2, 2020);
+		assertFalse(dateObj.validGetter());
+	}
+	@Test
+	public void test25_validDateMonth_nonValidLeap02()	{
+		Date dateObj = new Date(32, 13, 2020);
+		assertFalse(dateObj.validGetter());
+	}
+	@Test
+	public void test26_validDateMonth_negDay()	{
+		Date dateObj = new Date(-1, 1, 2021);
+		assertFalse(dateObj.validGetter());
+	}
+	@Test
+	public void test27_validDateMonth_negMonth()	{
+		Date dateObj = new Date(1, -1, 2021);
+		assertFalse(dateObj.validGetter());
+	}
+	@Test
+	public void test28_validDateMonth_negYear()	{
+		Date dateObj = new Date(1, 1, -2021);
+		assertFalse(dateObj.validGetter());
 	}
 	
+	//	Date.splitDate() Tests
+	
+	@Test
+	public void test29_splitDate_valid()	{
+		Date dateObj = new Date(1, 2, 3);
+		ArrayList<String> retVal = new ArrayList<String>(dateObj.splitGetter());
+		assertTrue(retVal.size() == 3);
+		assertTrue(retVal.get(0).equals("1"));
+		assertTrue(retVal.get(1).equals("2"));
+		assertTrue(retVal.get(2).equals("3"));
+		assertTrue(dateObj.getValidFlag());
+	}
+	@Test
+	public void test30_splitDate_invalid_greaterThan()	{
+		Date dateObj = new Date("1 2 3 4", 1, 2, 3);
+		ArrayList<String> retVal = new ArrayList<String>(dateObj.splitGetter());
+		assertTrue(retVal.size() == 4);
+		assertFalse(dateObj.getValidFlag());
+	}
+	@Test
+	public void test31_splitDate_invalid_lessThan()	{
+		Date dateObj = new Date("1 2", 1, 2, 3);
+		ArrayList<String> retVal = new ArrayList<String>(dateObj.splitGetter());
+		assertTrue(retVal.size() == 2);
+		assertFalse(dateObj.getValidFlag());
+	}
+	@Test
+	public void test32_splitDate_invalid_miscChars()	{
+		//	This program uses the approach of whitelist over blacklist and 
+		//	therefore if a date field does not match the expected type format
+		//	it will be flagged as invalid
+		Date dateObj = new Date("1,& 2 3", 1, 2, 3);
+		ArrayList<String> retVal = new ArrayList<String>(dateObj.splitGetter());
+		assertTrue(retVal.size() == 3);
+		assertFalse(dateObj.getValidFlag());
+	}
+	
+	//	Date.splitDateValidation() Tests
+	
+	@Test
+	public void test33_splitDateValidation_valid()	{
+		Date dateObj = new Date(1, 1, 1);
+		ArrayList<String> input = new ArrayList<String>();
+		input.add("1");
+		input.add("2");
+		input.add("3");
+		assertTrue(dateObj.splitValidGetter(input));
+	}
+	@Test
+	public void test34_splitDateValidation_invalid()	{
+		Date dateObj = new Date(1, 1, 1);
+		ArrayList<String> input = new ArrayList<String>();
+		input.add("1d&^*");
+		input.add("2");
+		input.add("3");
+		assertFalse(dateObj.splitValidGetter(input));
+
+	}
+	
+	//	Date Class Integration Tests
+	
+	@Test
+	public void test35_DateIntegration_nonLeapValid()	{
+		Date dateObj = new Date("28 02 2021");
+		assertTrue(dateObj.getValidFlag());
+	}
+	@Test
+	public void test36_DateIntegration_LeapValid()	{
+		Date dateObj = new Date("29 02 2020");
+		assertTrue(dateObj.getValidFlag());
+	}
+	@Test
+	public void test37_DateIntegration_nonLeapInvalid()	{
+		Date dateObj = new Date("29 02 2021");
+		assertFalse(dateObj.getValidFlag());
+	}
+	@Test
+	public void test38_DateIntegration_LeapInvalid()	{
+		Date dateObj = new Date("30 02 2020");
+		assertFalse(dateObj.getValidFlag());
+	}
+	@Test
+	public void test39_DateIntegration_wildCardInvalid01()	{
+		Date dateObj = new Date("01&*/ 04 2021");
+		assertFalse(dateObj.getValidFlag());
+	}
+	@Test
+	public void test40_DateIntegration_wildCardInvalid02()	{
+		Date dateObj = new Date("01f 04l 2021");
+		assertFalse(dateObj.getValidFlag());
+	}
+	@Test
+	public void test41_DateIntegration_MMDDYYYY_valid()	{
+		Date dateObj = new Date("12 25 2021");
+		assertTrue(dateObj.getValidFlag());
+	}
+	@Test
+	public void test43_DateIntegration_MMDDYYYY_validLeap()	{
+		//	Test42 is by test10
+		Date dateObj = new Date("02 29 2020");
+		assertTrue(dateObj.getValidFlag());
+	}
+	
+	//	DataLoading.lineToItem() Tests
 	
 }

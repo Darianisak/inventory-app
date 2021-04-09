@@ -36,6 +36,9 @@ public class Date implements Comparable<Date>{
 	 * Method that takes plain text date supplied as the best before
 	 * of an Item object, and rewrites it as comparable integers
 	 * Standard format is DD MM YYYY
+	 * The purpose, more or less, of this method is to assign  int values to
+	 * the class fields and determine if this a valid date; indicated by toggling
+	 * the validDate flag
 	 */
 	private void computeFields() {
 		ArrayList<String> tempList = splitDate();
@@ -94,7 +97,28 @@ public class Date implements Comparable<Date>{
 		}
 		lineScanner.close();
 		if	(info.size() != 3)	this.validDate = false;
+		if	(!splitDateValidation(info))	this.validDate = false;
 		return info;
+	}
+	
+	/**
+	 * This method is problematic no matter how its handled because theres
+	 * arguments for the other approach no matter what.
+	 * This method checks that the array entries in splitDate are comprised
+	 * purely of numerical data and that there are no non expected chars.
+	 * Operates on a whitelist principle rather than a blacklist principle
+	 */
+	private boolean splitDateValidation(ArrayList<String> dateInfo)	{
+		for	(String s : dateInfo) {
+			//	Converts current array string to an integer, if not strictly int
+			//	should throw an exception
+			try	{
+				Integer.parseInt(s);
+			}	catch	(NumberFormatException e)	{
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	/**
@@ -105,7 +129,8 @@ public class Date implements Comparable<Date>{
 	 */
 	private boolean validDateMonth()	{
 		//	Filters out negative dates to prevent map null pointers
-		if	(this.month < 1 || this.day < 1 || this.year < 1)	return false;
+		if	(this.month < 1 || this.day < 1 || this.year < 1 || this.month > 12 ||
+				this.day > 31)	return false;
 		//	Conditional checks if the date is less than or equal the amount
 		//	of days within the given month. Returns true is so, false otherwise
 		if	(this.day <= this.monthToDays.get(this.month)) return true;
@@ -241,10 +266,44 @@ public class Date implements Comparable<Date>{
 		monthDayMapping();
 	}
 	
+	/**	
+	 * Polymorphic Date constructor used for invalid testing of splitDate() method
+	 * @param date
+	 * @param test
+	 */
+	public Date(String date, int day, int month, int year) {
+		System.out.println("This constructor, Date(int, int, int) should " +
+				"be used for testing only");
+		this.textDate = date;
+		this.day = day;
+		this.month = month;
+		this.year = year;
+		monthDayMapping();
+	}
+	
 	/**
 	 * Public getter to access validDateMonth() for testing purposes
+	 * @return
 	 */
 	public boolean validGetter()	{
 		return validDateMonth();
+	}
+	
+	/**
+	 * Public getter to access split date for testing purposes
+	 * @return
+	 */
+	public ArrayList<String> splitGetter()	{
+		return splitDate();
+	}
+	
+	/**
+	 * Public getter to access split date validation method for testing
+	 * purposes
+	 * @param test
+	 * @return
+	 */
+	public boolean splitValidGetter(ArrayList<String> test)	{
+		return splitDateValidation(test);
 	}
 }
