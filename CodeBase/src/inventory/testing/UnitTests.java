@@ -1,6 +1,7 @@
 package inventory.testing;
 import inventory.lang.DataLoading;
 import inventory.customObjects.Date;
+import inventory.customObjects.Item;
 
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
@@ -322,4 +323,19 @@ public class UnitTests {
 	
 	//	DataLoading.lineToItem() Tests
 	
+	@Test
+	public void test44_lineToItem_validSize()	{
+		String temp = "test1	test2	test3	1 1 1";
+		DataLoading loadObj = new DataLoading();
+		Item tempItem = loadObj.lineToItemGetter(temp);
+		assertTrue(tempItem.getCat().equals("test1"));
+	}
+	@Test
+	public void test45_lineToItem_invalidSizeGreater()	{
+		String temp = "test1	test2	test3	1 1 1	test5";
+		DataLoading loadObj = new DataLoading();
+		Item tempItem = loadObj.lineToItemGetter(temp);
+		assertTrue(tempItem.getCat().equals("-1"));
+	}
+	//@Test
 }

@@ -1,5 +1,7 @@
 package inventory.gui;
 import java.io.File;
+import java.io.FileNotFoundException;
+
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 
@@ -39,15 +41,22 @@ public class GUI {
 	 * @return
 	 */
 	private File userLoading() {
-		File returnFile = new File("invalid");
-		fileLoader = new JFileChooser();
-		fileLoader.setDialogTitle("Choose an inventory file");
-		int fileStatus = fileLoader.showOpenDialog(new JFrame());
-		if	(fileStatus == JFileChooser.APPROVE_OPTION)	{
-			returnFile = fileLoader.getSelectedFile(); 
-		}	else {
-			System.out.println("Invalid Approve option?");
+		try	{
+			File returnFile = new File("invalid");
+			fileLoader = new JFileChooser();
+			fileLoader.setDialogTitle("Choose an inventory file");
+			int fileStatus = fileLoader.showOpenDialog(new JFrame());
+			if	(fileStatus == JFileChooser.APPROVE_OPTION)	{
+				returnFile = fileLoader.getSelectedFile(); 
+			}	else {
+				throw new FileNotFoundException();
+			}
+			return returnFile;
+		}	catch	(FileNotFoundException e)	{
+			//	Handles the case where a user does not select a file and 
+			//	immediately closes the program
+			System.exit(0);	
+			return new File("invalid");
 		}
-		return returnFile;
 	}
 }

@@ -132,8 +132,24 @@ public class DataLoading {
 		System.out.println("This constructor, DataLoading(), is for testing purposes only");
 	}
 	
+	/**
+	 * Public getter for schemaCheck() testing purposes
+	 * @param actual
+	 * @param valid
+	 * @return
+	 */
 	public boolean test_accessSchemaCheck(String actual, String valid)	{
 		return schemaCheck(actual, valid);	
 	}
+	
+	/**
+	 * Public getter for lineToItem() method for testing purposes
+	 * @param s
+	 * @return
+	 */
+	public Item lineToItemGetter(String s)	{
+		return lineToItem(s);
+	}
+	
 	
 }
