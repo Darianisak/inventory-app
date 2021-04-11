@@ -6,6 +6,7 @@ import inventory.customObjects.Item;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
 import java.lang.reflect.*;
 import java.util.*;
 
@@ -337,5 +338,91 @@ public class UnitTests {
 		Item tempItem = loadObj.lineToItemGetter(temp);
 		assertTrue(tempItem.getCat().equals("-1"));
 	}
-	//@Test
+	@Test
+	public void test46_lineToItem_invalidDelim()	{
+		String temp = "Test1 test2 test3 1 1 1";
+		DataLoading loadObj = new DataLoading();
+		Item tempItem = loadObj.lineToItemGetter(temp);
+		assertTrue(tempItem.getCat().equals("-1"));
+	}
+	
+	//	DataLoading Integration Tests - These tests rely on repository files
+	//	within the test files folder
+	
+	@Test
+	public void test47_DataLoading_NoSchemaOrElements()	{
+		File testFile = new File("/Users/darianculver/Documents/GitHub/inventory-app/TestFiles/No_Schema_Or_Elements.txt");
+		DataLoading dataObj = new DataLoading(testFile);
+		Item tempItem = new Item("Test1", "Test2", "Test3", "1 1 1");
+		ArrayList<Item> checkArr = new ArrayList<Item>();
+		try	{
+			checkArr = dataObj.getFileContents();
+		}	catch	(NullPointerException e) {
+			checkArr.add(tempItem);
+		}
+		assertTrue(checkArr.size() == 1);
+	}
+	@Test
+	public void test48_DataLoading_NoSchemaThreeElements()	{
+		File testFile = new File("/Users/darianculver/Documents/GitHub/inventory-app/TestFiles/No_Schema_Three_Elements.txt");
+		DataLoading dataObj = new DataLoading(testFile);
+		Item tempItem = new Item("Test1", "Test2", "Test3", "1 1 1");
+		ArrayList<Item> checkArr = new ArrayList<Item>();
+		try	{
+			checkArr = dataObj.getFileContents();
+		}	catch	(NullPointerException e) {
+			checkArr.add(tempItem);
+		}
+		assertTrue(checkArr.size() == 1);
+	}
+	@Test
+	public void test49_DataLoading_EightValidElements()	{
+		File testFile = new File("/Users/darianculver/Documents/GitHub/inventory-app/TestFiles/Schema_Eight_Elements.txt");
+		DataLoading dataObj = new DataLoading(testFile);
+		Item tempItem = new Item("Test1", "Test2", "Test3", "1 1 1");
+		ArrayList<Item> checkArr = new ArrayList<Item>();
+		try	{
+			checkArr = dataObj.getFileContents();
+		}	catch	(NullPointerException e) {
+			checkArr.add(tempItem);
+		}
+		assertTrue(checkArr.size() == 8);
+		assertTrue(checkArr.get(0).getBB().equals(new Date("1 1 1")));
+		assertTrue(checkArr.get(1).getBB().equals(new Date("2 2 2")));
+		assertTrue(checkArr.get(2).getBB().equals(new Date("3 3 3")));
+		assertTrue(checkArr.get(3).getBB().equals(new Date("28 02 2021")));
+		assertTrue(checkArr.get(4).getBB().equals(new Date("29 02 2020")));
+		assertTrue(checkArr.get(5).getBB().equals(new Date("11 20 2020")));
+		assertTrue(checkArr.get(6).getBB().equals(new Date("12 20 2020")));
+		assertTrue(checkArr.get(7).getBB().equals(new Date("02 29 2020")));
+	}
+	@Test
+	public void test50_DataLoading_SchemaNoElements()	{
+		File testFile = new File("/Users/darianculver/Documents/GitHub/inventory-app/TestFiles/Schema_No_Elements.txt");
+		DataLoading dataObj = new DataLoading(testFile);
+		Item tempItem = new Item("Test1", "Test2", "Test3", "1 1 1");
+		ArrayList<Item> checkArr = new ArrayList<Item>();
+		try	{
+			checkArr = dataObj.getFileContents();
+		}	catch	(NullPointerException e) {
+			checkArr.add(tempItem);
+		}
+		assertTrue(checkArr.size() == 1);
+	}
+	@Test
+	public void test51_DataLoading_SchemaThreeElements()	{
+		File testFile = new File("/Users/darianculver/Documents/GitHub/inventory-app/TestFiles/Schema_Three_elements.txt");
+		DataLoading dataObj = new DataLoading(testFile);
+		Item tempItem = new Item("Test1", "Test2", "Test3", "1 1 1");
+		ArrayList<Item> checkArr = new ArrayList<Item>();
+		try	{
+			checkArr = dataObj.getFileContents();
+		}	catch	(NullPointerException e) {
+			checkArr.add(tempItem);
+		}
+		assertTrue(checkArr.size() == 3);
+		assertTrue(checkArr.get(0).getBB().equals(new Date("1 1 1")));
+		assertTrue(checkArr.get(1).getBB().equals(new Date("2 2 2")));
+		assertTrue(checkArr.get(2).getBB().equals(new Date("3 3 3")));
+	}
 }

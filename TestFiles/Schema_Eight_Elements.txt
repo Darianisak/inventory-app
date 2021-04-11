@@ -1,0 +1,16 @@
+category	itemName	size	bestBefore
+Valid	bb	0.00	1 1 1
+Valid	cc	0.00	2 2 2
+Valid	dd	0.00	3 3 3
+False ee 0.00 4 4 4
+False	ff	0.00	5f 5 5
+False	gg	0.00	6 6 6	fg
+Valid	hh	0.00	28 02 2021
+Valid	ii	0.00	29 02 2020
+False	jj	0.00	29 02 2021
+False
+
+Valid	mm	0.00	11 20 2020
+Valid	nn	0.00	12 20 2020
+Valid	oo	0.00	02 29 2020
+False	pp	0.00	29 02 2021	False	pp	0.00	29 02 2021

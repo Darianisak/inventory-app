@@ -17,6 +17,9 @@ public class DataLoading {
 											//	file schema
 	private boolean schemaChecked = false;	//	Flag if the inv files schema has
 											//	been checked
+	private	ArrayList<Item> fileContents = new ArrayList<Item>();	//	Field
+											//	for storing the converted file
+											//	data for later use
 	
 	/**
 	 * Constructor method for dataLoading - calls a 'main' method
@@ -33,7 +36,7 @@ public class DataLoading {
 	private void readData(File inven)	{
 		try	(FileReader invenReader = new FileReader(inven))	{
 			//	Path of propagation thru which dataLoading operates
-			ArrayList<Item> file = createItems(invenReader);
+			this.fileContents = createItems(invenReader);
 		}	catch	(IOException e) {
 			System.out.println("Exception thrown in DataLoading");
 			e.printStackTrace();
@@ -71,6 +74,24 @@ public class DataLoading {
 		}
 		System.out.println(returnArr);
 		return returnArr;
+	}
+	
+	/**	
+	 * Getter method by which the loaded file contents can be loaded into the
+	 * main class of the program post loading.
+	 * If the arrayList of loaded data is empty, it means the method is being
+	 * called prior to a valid file being supplied which should never happen - 
+	 * UNLESS, the file is empty besides the schema, in which case a try catch
+	 * will handle it differently
+	 * @return
+	 */
+	public ArrayList<Item> getFileContents()	{
+		if	(this.fileContents.size() != 0) {
+			return this.fileContents;
+		}	else	{
+			//	This branch should never be called
+			throw new NullPointerException();
+		}
 	}
 	
 	/**

@@ -1,0 +1,3 @@
+Valid	bb	0.00	1 1 1
+Valid	cc	0.00	2 2 2
+Valid	dd	0.00	3 3 3
