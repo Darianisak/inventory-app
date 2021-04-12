@@ -17,7 +17,7 @@ public class GUI {
 	private JFileChooser fileLoader;	//	File loading
 	private JFrame programFrame;	//	Stores the frame the programs GUI is held
 									//	within
-	//private JPanel
+	private JPanel mainPanel;
 	private String	appName = "OptiPantry";	//	App name - stored in field for 
 									//	quick changes
 	
@@ -75,6 +75,7 @@ public class GUI {
 		programFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		programFrame.setSize(new Dimension(1080, 720));
 		
+		mainPanel = new JPanel()
 		programFrame.setVisible(true);
 	}
 }
