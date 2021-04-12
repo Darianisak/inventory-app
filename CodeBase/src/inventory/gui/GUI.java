@@ -1,4 +1,5 @@
 package inventory.gui;
+import java.awt.Dimension;
 import java.io.File;
 import java.io.FileNotFoundException;
 
@@ -14,6 +15,11 @@ import inventory.lang.InventoryApp;
 public class GUI {
 	
 	private JFileChooser fileLoader;	//	File loading
+	private JFrame programFrame;	//	Stores the frame the programs GUI is held
+									//	within
+	//private JPanel
+	private String	appName = "OptiPantry";	//	App name - stored in field for 
+									//	quick changes
 	
 	
 	/**
@@ -29,7 +35,8 @@ public class GUI {
 	 */
 	private void runGUI()	{
 		//	Calls userLoadings and sends a selected file to main field
-		new InventoryApp().doLoading(userLoading());
+		//new InventoryApp().doLoading(userLoading());
+		fullGUI();
 	}
 	
 	/**
@@ -58,5 +65,16 @@ public class GUI {
 			System.exit(0);	
 			return new File("invalid");
 		}
+	}
+	
+	/**
+	 * Fully fledged GUI class for applicaiton
+	 */
+	private	void fullGUI()	{
+		programFrame = new JFrame(this.appName);
+		programFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		programFrame.setSize(new Dimension(1080, 720));
+		
+		programFrame.setVisible(true);
 	}
 }
