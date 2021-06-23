@@ -1,8 +1,7 @@
 package inventory.lang;
 
-import java.awt.Graphics;
-import java.awt.event.MouseEvent;
 import java.io.File;
+import java.util.Stack;
 
 public class Pantry_Sorter extends GUI{
 
@@ -17,16 +16,19 @@ public class Pantry_Sorter extends GUI{
 	}
 
 	@Override
-	protected void onSearch() {
+	protected void onAction(Stack<String> events, String input) {
 		// TODO Auto-generated method stub
-		getTextOutputArea().setText("fucking work");
+		if	(!events.isEmpty())	getTextOutputArea().setText(events.pop());
+		System.out.println("inputField: " + input + "\nnewLine fuck");
+		
+		getTextOutputArea().setText("Line1Fuck\nLine2Fuck");
 		
 	}
 
 	@Override
 	protected void onLoad(File nodes) {
 		// TODO Auto-generated method stub
-		
+		System.out.println("load called in pantry");
 	}
 	
 }
