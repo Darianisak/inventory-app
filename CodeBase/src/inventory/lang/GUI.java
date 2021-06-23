@@ -47,6 +47,17 @@ public abstract class GUI {
 	 * queryField, aka JTextField.
 	 */
 	protected abstract void onAction(Stack<String> events, String input);
+	
+	/**
+	 * onAction is a single argument specific method, ideally only used for
+	 * cases of "static" button presses, such as save. Besides this, it is
+	 * functional identical as a method prototype to the priorly defined
+	 * onAction method.
+	 * 
+	 * @param events is a stack of all buttons pressed recently; this stack
+	 * does not include references to the queryField.
+	 */
+	protected abstract void onAction(Stack<String> events);
 
 	/**
 	 * onLoad is an abstract method which allows the working file to be
@@ -86,28 +97,13 @@ public abstract class GUI {
 	 * the display will not be updated.
 	 */
 	public void redraw() {frame.repaint();}
-
-	//	TODO no documentation below this point has been updated
 	
-	/*
-	 * In Swing, everything is a component; buttons, graphics panes, tool tips,
-	 * and the window frame are all components. This is implemented by
-	 * JComponent, which sits at the top of the component inheritance hierarchy.
-	 * A JFrame is a component that represents the outer window frame (with the
-	 * minimise, maximise, and close buttons) of your program. Every swing
-	 * program has to have one somewhere. JFrames can, of course, have other
-	 * components inside them. JPanels are your bog-standard container component
-	 * (can have other components inside them), that are used for laying out
-	 * your UI.
-	 */
+	//	GUI related global variables
 	
-
-	private static final int TEXT_OUTPUT_ROWS = 10;
-	private static final int SEARCH_COLS = 15;
-		
-
+	private static final int TEXT_OUTPUT_ROWS = 10;	//	Defines height of textOutputArea
+	private static final int SEARCH_COLS = 15;		//	Defines width of queryField
+	
 	private JFrame frame;
-	private JComponent drawing; // we customise this to make it a drawing pane.
 	private JTextArea textOutputArea;
 	private JTextField queryField;
 	private JFileChooser fileChooser;
@@ -120,7 +116,7 @@ public abstract class GUI {
 	@SuppressWarnings("serial")
 	private void initialise() {
 
-		//	Initialises the buttons and their respective action listeners, but
+		//	Initializes the buttons and their respective action listeners, but
 		//	does not add it to the GUI.
 		
 		JButton quit = new JButton("Quit");
@@ -181,6 +177,8 @@ public abstract class GUI {
 		save.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ev) {
 				eventStack.push("SAVE");
+				onAction(eventStack);
+				redraw();
 			}
 		});
 
@@ -188,12 +186,13 @@ public abstract class GUI {
 		sort.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ev) {
 				eventStack.push("SORT");
+				onAction(eventStack);
+				redraw();
 			}
 		});
 
-		// next, make the search box at the top-right. we manually fix
-		// it's size, and add an action listener to call your code when
-		// the user presses enter.
+		//	Generate the Query Field element of the GUI
+		
 		queryField = new JTextField(SEARCH_COLS);
 		queryField.setMaximumSize(new Dimension(0, 25));
 		queryField.addActionListener(new ActionListener() {
@@ -230,7 +229,8 @@ public abstract class GUI {
 		// components out.
 		controls.add(Box.createRigidArea(new Dimension(15, 0)));
 
-		//	GUI layout of main controls
+		//	GUI layout of main controls ~ Comments from this point on are 
+		//	largely unmodified from the orginal source
 		
 		JPanel navigation = new JPanel();
 		navigation.setMaximumSize(new Dimension(150, 60));
@@ -250,10 +250,7 @@ public abstract class GUI {
 		controls.add(Box.createRigidArea(new Dimension(5, 0)));
 		controls.add(queryField);
 
-		/*
-		 * then make the JTextArea that goes down the bottom. we put this in a
-		 * JScrollPane to get scroll bars when necessary.
-		 */
+		//	Generate the output area where all text will be written
 
 		textOutputArea = new JTextArea(TEXT_OUTPUT_ROWS, 0);
 		textOutputArea.setLineWrap(true);
@@ -279,7 +276,6 @@ public abstract class GUI {
 		// JSplitPanes have a default border that makes an ugly row of pixels at
 		// the top, remove it.
 		split.setBorder(BorderFactory.createEmptyBorder());
-		split.setTopComponent(drawing);
 		split.setBottomComponent(scroll);
 
 		frame = new JFrame("Mapper");
