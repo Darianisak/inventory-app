@@ -158,6 +158,13 @@ public abstract class GUI {
 				eventStack.push("SEARCH");
 			}
 		});
+		
+		JButton display = new JButton("Display");
+		display.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent ev)	{
+				eventStack.push("DISPLAY");
+			}
+		});
 
 		JButton add = new JButton("Add");
 		add.addActionListener(new ActionListener() {
@@ -239,6 +246,7 @@ public abstract class GUI {
 		navigation.add(remove);
 		navigation.add(searchButton);
 		navigation.add(sort);
+		navigation.add(display);
 		navigation.add(quit);
 		controls.add(navigation);
 		controls.add(Box.createRigidArea(new Dimension(15, 0)));
