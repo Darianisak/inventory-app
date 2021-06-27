@@ -4,7 +4,13 @@ import java.awt.Color;
 import java.io.File;
 import java.util.EmptyStackException;
 import java.util.Stack;
+
+import inventory.lang.Parser.ItemNode;
+import inventory.lang.Parser.ProgramNode;
+
 import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class Pantry_Sorter extends GUI{
 
@@ -12,7 +18,7 @@ public class Pantry_Sorter extends GUI{
 	private Parser parseObj = new Parser();
 	
 	private ItemProgramNode itemTree = null;
-	private HashMap<String, ItemProgramNode> itemAdjList = null;
+	private HashMap<String, ItemNode> itemAdjList = null;
 	
 	/**
 	 * Main function for running the program. As it is an extension of GUI,
@@ -89,12 +95,22 @@ public class Pantry_Sorter extends GUI{
 	@Override
 	protected void onLoad(File items) {
 		//	Generate the item tree
-		this.itemTree = this.parseObj.topLevelParser(items);
-		if	(this.itemTree != null)	{
-			//	Generate the unsorted adjacency list to save on computation
-			//	later
-			//	TODO
-		}
+		this.itemTree = this.parseObj.topLevelParser(items, this);
+		
+		//	TODO this is crap, the above call needs a try catch for runtimes
+		//	additionally need to handle adj lists properly and empty trees
+		
+		reportSuccess("The file was successfully loaded and all supporting\n"
+				+ "assets were generated.\nThere were " + this.itemAdjList.size()
+				+ " items loaded.\n If this number is zero, the file was empty.");
+	}
+	
+	private void computeAdjList()	{
+		
+	}
+	
+	private void computeCatAdj()	{
+		
 	}
 	
 	/**
@@ -107,8 +123,38 @@ public class Pantry_Sorter extends GUI{
 	 * @param error contains an error message status to print to the GUI
 	 */
 	public void reportError(String error)	{
+		
+		//	TODO look at concatenating past messages on to the just received one,
+		//	otherwise some messages might be cleared before they can even be read.
+		
 		getTextOutputArea().setForeground(Color.RED);
 		getTextOutputArea().setText(error);		
+	}
+	
+	/**
+	 * setter for reporting a success progress message to the screen. For more
+	 * detailed process explanation, see the javaDoc for "reportError". This
+	 * method should be used to indicate that, for example, items are finished
+	 * loading, etc.
+	 * 
+	 * @param message to print to screen in the color green.
+	 */
+	public void reportSuccess(String message)	{
+		getTextOutputArea().setForeground(Color.GREEN);
+		getTextOutputArea().setText(message);
+	}
+	
+	/**
+	 * setter for reporting normal functions by the program. For more detailed
+	 * process explanation, see the javaDoc for "reportError". This method 
+	 * should be used to, for example, show all the items that the user has
+	 * loaded, etc.
+	 * 
+	 * @param message to print to screen in the color black.
+	 */
+	public void reportStandard(String message)	{
+		getTextOutputArea().setForeground(Color.BLACK);
+		getTextOutputArea().setText(message);
 	}
 	
 	/**

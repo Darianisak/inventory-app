@@ -286,7 +286,7 @@ public abstract class GUI {
 		split.setBorder(BorderFactory.createEmptyBorder());
 		split.setBottomComponent(scroll);
 
-		frame = new JFrame("Mapper");
+		frame = new JFrame("Pantry Sorter");
 		// this makes the program actually quit when the frame's close button is
 		// pressed.
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
