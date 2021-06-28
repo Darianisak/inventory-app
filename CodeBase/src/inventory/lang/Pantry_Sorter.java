@@ -2,6 +2,7 @@ package inventory.lang;
 
 import java.awt.Color;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.EmptyStackException;
 import java.util.Stack;
 
@@ -95,14 +96,23 @@ public class Pantry_Sorter extends GUI{
 	@Override
 	protected void onLoad(File items) {
 		//	Generate the item tree
-		this.itemTree = this.parseObj.topLevelParser(items, this);
 		
+		//	TODO ~ add proper handling for throwables in catch clauses
+		try	{
+			this.itemTree = this.parseObj.topLevelParser(items);
+		}	catch	(FileNotFoundException e)	{
+			//	Scanner error
+		}	catch	(ItemListException e)	{
+			//	Grammar error/ Parser error
+		}
+		
+		this.itemAdjList = new HashMap<String, ItemNode>();
 		//	TODO this is crap, the above call needs a try catch for runtimes
 		//	additionally need to handle adj lists properly and empty trees
-		
-		reportSuccess("The file was successfully loaded and all supporting\n"
-				+ "assets were generated.\nThere were " + this.itemAdjList.size()
-				+ " items loaded.\n If this number is zero, the file was empty.");
+		System.out.println("done");
+		//reportSuccess("The file was successfully loaded and all supporting\n"
+		//		+ "assets were generated.\nThere were " + this.itemAdjList.size()
+		//		+ " items loaded.\n If this number is zero, the file was empty.");
 	}
 	
 	private void computeAdjList()	{
@@ -123,12 +133,8 @@ public class Pantry_Sorter extends GUI{
 	 * @param error contains an error message status to print to the GUI
 	 */
 	public void reportError(String error)	{
-		
-		//	TODO look at concatenating past messages on to the just received one,
-		//	otherwise some messages might be cleared before they can even be read.
-		
 		getTextOutputArea().setForeground(Color.RED);
-		getTextOutputArea().setText(error);		
+		getTextOutputArea().insert(error.concat("\n"), 0);		
 	}
 	
 	/**
@@ -141,7 +147,7 @@ public class Pantry_Sorter extends GUI{
 	 */
 	public void reportSuccess(String message)	{
 		getTextOutputArea().setForeground(Color.GREEN);
-		getTextOutputArea().setText(message);
+		getTextOutputArea().insert(message.concat("\n"), 0);	
 	}
 	
 	/**
@@ -154,7 +160,7 @@ public class Pantry_Sorter extends GUI{
 	 */
 	public void reportStandard(String message)	{
 		getTextOutputArea().setForeground(Color.BLACK);
-		getTextOutputArea().setText(message);
+		getTextOutputArea().insert(message.concat("\n"), 0);	
 	}
 	
 	/**

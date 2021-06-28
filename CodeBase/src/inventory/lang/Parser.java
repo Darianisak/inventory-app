@@ -2,60 +2,48 @@ package inventory.lang;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.time.LocalDate;
 import java.util.Scanner;
 import java.util.ArrayList;
-import java.util.Date;
-
-
 
 public class Parser	{
-	
-	private Pantry_Sorter printerObject = null;
 
+	//	TODO ~ add throws documentation to class
+	
 	/**
 	 * Top down parse method; transposes a file to a Scanner, to be modified
-	 * out of method.
+	 * out of method. When calling this method, make sure it is set up to handle
+	 * both FileNotFoundExceptions, which are thrown by the Scanner, and
+	 * ItemListExceptions, which can be thrown during most parse methods as a
+	 * result of ignoring grammar rules.
 	 * 
 	 * @param pathof is the designated file path
 	 * @return a complete ABS Tree of the input file
 	 */
-	public ItemProgramNode topLevelParser(File items, Pantry_Sorter print) {
+	public ItemProgramNode topLevelParser(File items) 
+			throws ItemListException, FileNotFoundException {
 		Scanner fScan = null;
-		this.printerObject = print;
-		try	{
-			fScan = new Scanner(items);
-			//	Sets a delimitter where the only consecutive tokens allowed
-			//	are , and ;
-			fScan.useDelimiter("\\s+|(?=[,;])|(?<=[,;])");
-			ItemProgramNode itemTree = parseInventory(fScan);
-			fScan.close();
-			return itemTree;
-		}	catch	(FileNotFoundException e)	{
-			//	Branch where the method was supplied with an invalid items arg
-			this.printerObject.reportError("The file supplied was invalid.\n "
-					+ "Please select a different file.");
-		}	catch	(RuntimeException e)	{
-			//	Branch where the parser was unable to complete operations
-			this.printerObject.reportError("The parser encountered an error.\n"
-					+ "Check that the provided file matches the expected patterns.");
-		}
-		return null;
+		fScan = new Scanner(items);
+		ItemProgramNode itemTree = parseInventory(fScan);
+		fScan.close();
+		return itemTree;
 	}
 	
-	private ItemProgramNode parseInventory(Scanner iScan)	{
+	/**
+	 * TODO
+	 * @param iScan
+	 * @return
+	 * @throws ItemListException
+	 */
+	public ItemProgramNode parseInventory(Scanner iScan) throws ItemListException {
 		ProgramNode itemTree = new ProgramNode();
-		
+		//	Sets a delimitter where the only consecutive tokens allowed
+		//	are , and ;
+		iScan.useDelimiter("\\s+|(?=[,;])|(?<=[,;])");
 		while	(iScan.hasNext())	{
-			itemTree.addItem(parseItem(iScan));
+			itemTree.addItem(parseItem(iScan));		
 		}
-		if	(itemTree.getItems().isEmpty())	{
-			//	Informs the user that they specified an empty file to be read.
-			this.printerObject.reportError("File specified was empty, so only adding is supported.");
-			return itemTree;
-		}	else	{
-			this.printerObject.reportSuccess("File loaded succesfully.");
-			return itemTree;
-		}
+		return itemTree;
 	}
 	
 	//	Relevant parse methods
@@ -72,28 +60,36 @@ public class Parser	{
 	 * @param token is 'hopefully' the name of an item, or the first token in
 	 * an item's token sequence
 	 * @return a complete ItemNode
+	 * @throws
 	 */
-	private ItemNode parseItem(Scanner token) {
+	@SuppressWarnings("finally")
+	private ItemNode parseItem(Scanner token) throws ItemListException {
 		ItemNode currentItem = new ItemNode();
 		try	{
 			//	Parse itemName
 			currentItem.setName(parseName(token));
 			//	Parse Quantity
-			currentItem.setQuan(parseQuan(token));
+			currentItem.setQuan(parseQuan(token));	
 			//	Parse BestBefore
 			currentItem.setDate(parseBestBefore(token));
 			//	Parse Category
 			currentItem.setCat(parseCategory(token));
-		}	catch	(ItemListException e) {
-			//	If a parse error is encountered, signal that to the user and
-			//	throw a runtime
-			this.printerObject.reportError("An error was encountered while parsing: " 
-					+ currentItem.toString());
-			throw new RuntimeException();
+		}	catch (ItemListException e)	{
+			System.out.println("itemexcp caught in parseItem");
+			throw new ItemListException();
+		}	finally	{ 
+			
+			//	TODO ~ this does not handle errors right at all
+			//	https://stackoverflow.com/questions/7219963/return-a-value-and-throw-an-exception
+			
+			//	If this method doesn't return, i.e. due to an ItemListException
+			//	being thrown by a lower level parser, it results in a lot of
+			//	NullPointerExceptions. As such, the only way I can think to
+			//	handle this is to use a finally branch to force the method to
+			//	return no matter what.
+			return currentItem;
 		}
-		//	As an error should be flagged, assume currentItem is safe and 
-		//	return it to parseInventory.
-		return currentItem;
+		
 	}
 	
 	/**
@@ -104,8 +100,8 @@ public class Parser	{
 	 * @return the name of the item.
 	 */
 	private String parseName(Scanner token) throws ItemListException	{
-		String retVal = token.next();
 		if	(token.hasNext()) {
+			String retVal = token.next();
 			//	Evaluate whether the next token is ',' and thus meets the
 			//	grammar.
 			if	(token.hasNext(","))	{
@@ -113,6 +109,7 @@ public class Parser	{
 				return retVal;
 			}	
 		}
+		System.out.println("exception");
 		//	Tokens do not conform to grammar rules.
 		throw new ItemListException();
 		
@@ -153,12 +150,25 @@ public class Parser	{
 	 * before.
 	 * @return a java date object, indicating the Best before date of the item.
 	 */
-	private Date parseBestBefore(Scanner token)	throws ItemListException	{
-		
-		//	TODO needs redesign, Date is shit apparently https://www.baeldung.com/java-8-date-time-intro
-		
-		System.out.println("gets to date");
-		return null;
+	private LocalDate parseBestBefore(Scanner token)	throws ItemListException	{
+		if	(token.hasNextInt()) {
+			//	Gets DD
+			int day = token.nextInt();
+			if	(token.hasNextInt())	{
+				//	Gets MM
+				int month = token.nextInt();
+				if	(token.hasNextInt())	{
+					//	Gets YYYY
+					int year = token.nextInt();
+					if	(token.hasNext(","))	{
+						token.next();
+						return LocalDate.of(year, month, day);
+					}
+				}
+			}
+		}
+		//	Tokens do not conform to grammar rules.
+		throw new ItemListException();
 	}
 	
 	/**
@@ -170,7 +180,15 @@ public class Parser	{
 	 * @return the category name.
 	 */
 	private String parseCategory(Scanner token)	throws ItemListException	{
-		return null;
+		if (token.hasNext()) {
+			String catName = token.next();
+			if	(token.hasNext(";"))	{
+				token.next();
+				return catName;
+			}
+		}
+		//	Tokens do not conform to grammar rules.
+		throw new ItemListException();
 	}
 	
 	//	SubClasses of ItemProgramNode, used for generating the paser tree
@@ -187,7 +205,7 @@ public class Parser	{
 		 * @return an ArrayList of ItemNodes, aka child nodes.
 		 */
 		public ArrayList<ItemNode> getItems()	{
-			return items;
+			return this.items;
 		}
 		
 		/**
@@ -203,15 +221,7 @@ public class Parser	{
 		public String toString()	{
 			String output = "";
 			for	(ItemNode item : this.items) {
-				
-				//	TODO rewrite this; override itemNode toString and tidy this
-				
-				String temp = item.getName() + ", ";
-				temp.concat(item.getQuan().getPrefix() + " " + 
-							item.getQuan().getAmount() +", "); 
-				temp.concat(item.getDate().toString() + ", ");
-				temp.concat(item.getCat() + "; ");
-				output.concat(temp);
+				output.concat(item.toString());
 			}
 			return output;
 		}
@@ -221,7 +231,7 @@ public class Parser	{
 		
 		private String itemName = "null";
 		private Quantity amount = null;
-		private Date bestBefore= null;
+		private LocalDate bestBefore= null;
 		private String category = "null";
 		
 		/**
@@ -257,7 +267,7 @@ public class Parser	{
 		 * 
 		 * @param bb is the date to specify as the best before.
 		 */
-		public void setDate(Date bb)	{this.bestBefore = bb;}
+		public void setDate(LocalDate bb)	{this.bestBefore = bb;}
 		
 		/**
 		 * getDate is a getter method for accessing the best before date of an
@@ -265,7 +275,7 @@ public class Parser	{
 		 * 
 		 * @return the best before date of this item.
 		 */
-		public Date getDate()	{return this.bestBefore;}
+		public LocalDate getDate()	{return this.bestBefore;}
 		
 		/**
 		 * setCat is a setter method for specifying the category that an item 
@@ -282,5 +292,12 @@ public class Parser	{
 		 * @return the specified category of this item.
 		 */
 		public String getCat()	{return this.category;}
+		
+		@Override
+		public String toString()	{
+			return this.itemName + ", " + this.amount.toString() + 
+					this.bestBefore.getDayOfMonth() + " " + this.bestBefore.getMonthValue() +
+					" " + this.bestBefore.getYear() + ", " + this.category + "; ";
+		}
 	}
 }

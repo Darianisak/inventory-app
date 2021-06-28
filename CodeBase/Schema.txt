@@ -1,2 +1,2 @@
-muesli, KG 0.5, 16 05 2023, DryFood;
-banana, KG 1, 16 07 2021, Fruit;
+muesli, KG 0.5, 16 05 2023; DryFood;
+banana, KG 1, 16 07 2021; Fruit;
