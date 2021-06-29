@@ -5,6 +5,11 @@ public class SolidQuan implements Quantity {
 	private String prefix = "KG";
 	private Double amount = 0.0;
 	
+	/**
+	 * Constructor for creating an object of type SolidQuan.
+	 * 
+	 * @param amount is the weight this object should be set to.
+	 */
 	public SolidQuan(Double amount)	{
 		this.amount = amount;
 	}

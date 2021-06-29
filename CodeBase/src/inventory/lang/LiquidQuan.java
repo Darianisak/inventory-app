@@ -5,6 +5,11 @@ public class LiquidQuan implements Quantity	{
 	private String prefix = "L";
 	private Double amount = 0.0;
 	
+	/**
+	 * Constructor for creating an object of type LiquidQuan.
+	 * 
+	 * @param amount is the weight this object should be set to.
+	 */
 	public LiquidQuan(Double amount)	{
 		this.amount = amount;
 	}

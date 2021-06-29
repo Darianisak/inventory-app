@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public class Parser	{
 
-	//	TODO ~ add throws documentation to class
+	private String errorStatus = "nE";
 	
 	/**
 	 * Top down parse method; transposes a file to a Scanner, to be modified
@@ -17,11 +17,12 @@ public class Parser	{
 	 * ItemListExceptions, which can be thrown during most parse methods as a
 	 * result of ignoring grammar rules.
 	 * 
-	 * @param pathof is the designated file path
+	 * @param items is the designated file path
 	 * @return a complete ABS Tree of the input file
+	 * @throws FileNotFoundException when the Scanner fails to accept the
+	 * specified file directory.
 	 */
-	public ItemProgramNode topLevelParser(File items) 
-			throws ItemListException, FileNotFoundException {
+	public ItemProgramNode topLevelParser(File items) throws FileNotFoundException {
 		Scanner fScan = null;
 		fScan = new Scanner(items);
 		ItemProgramNode itemTree = parseInventory(fScan);
@@ -30,19 +31,63 @@ public class Parser	{
 	}
 	
 	/**
-	 * TODO
-	 * @param iScan
-	 * @return
-	 * @throws ItemListException
+	 * parseInventory is responsible for converting an input file stream into
+	 * an ABS with many item nodes attached. This method has some quirks that
+	 * should be noted for any further implementation, such as:
+	 * 
+	 * Supplying an empty file, perhaps for pure writing, will not return an
+	 * empty ABS tree, and instead will return an ABS with 1 child element
+	 * and an errorStatus of eS.
+	 * 
+	 * If a parser error occurs during runtime, say in the middle of a file, no
+	 * further items will be added to the itemList of the tree. Instead, a null
+	 * object will be added at position 0 of the list, along with any of 4 error
+	 * codes.
+	 * 
+	 * As such, itemList.size() often can return unexpected results if an error
+	 * has occured. For example, an empty file will have a list size of 1, but 
+	 * so will a file with only 1 item in it. If the parser fails on the first
+	 * item, there will be 2 items within the list.
+	 * 
+	 * On subsequent calls to the parser during a single process, the error code
+	 * will be reset to eS and then changed accordingly. This means that error
+	 * reporting for multiple calls of the parser is independant of one another.
+	 * 
+	 * @param iScan is the active scanner, with no token increment applied.
+	 * @return an ItemProgramNode, which is an ABS Tree of all the items from
+	 * the selected file.
 	 */
-	public ItemProgramNode parseInventory(Scanner iScan) throws ItemListException {
+	public ItemProgramNode parseInventory(Scanner iScan) {
 		ProgramNode itemTree = new ProgramNode();
+		this.errorStatus = "eS";
+		
 		//	Sets a delimitter where the only consecutive tokens allowed
 		//	are , and ;
 		iScan.useDelimiter("\\s+|(?=[,;])|(?<=[,;])");
 		while	(iScan.hasNext())	{
+			this.errorStatus = "nE";
 			itemTree.addItem(parseItem(iScan));		
+			
+			//	After each element is added, perform parser validation by
+			//	checking the assigned variable of errorStatus. If it returns
+			//	'nE' or noError, there was no reported parsing error and the
+			//	parser can continue to operate. Errors are signalled by the
+			//	insertion of a null element at index 0 of the itemList of this
+			//	tree. By reporting the errors this way, we can avoid 'void'
+			//	returns that would stem from throwing an exception and not returning
+			//	a tree. This just means that whatever out of class method that
+			//	has called the Parser class will need to manually check for
+			//	invalid parsing. 
+			
+			if	(!this.errorStatus.equals("nE"))	{
+				//	Add the null flag item and break out of the loop
+				itemTree.getItems().add(0, null);
+				break;
+			}
 		}
+		//	Prevents NullPointers arising from empty files.
+		if	(this.errorStatus == "eS") itemTree.addItem(null);
+			
 		return itemTree;
 	}
 	
@@ -60,35 +105,22 @@ public class Parser	{
 	 * @param token is 'hopefully' the name of an item, or the first token in
 	 * an item's token sequence
 	 * @return a complete ItemNode
-	 * @throws
 	 */
-	@SuppressWarnings("finally")
-	private ItemNode parseItem(Scanner token) throws ItemListException {
+	private ItemNode parseItem(Scanner token) {
 		ItemNode currentItem = new ItemNode();
-		try	{
-			//	Parse itemName
-			currentItem.setName(parseName(token));
-			//	Parse Quantity
-			currentItem.setQuan(parseQuan(token));	
-			//	Parse BestBefore
-			currentItem.setDate(parseBestBefore(token));
-			//	Parse Category
-			currentItem.setCat(parseCategory(token));
-		}	catch (ItemListException e)	{
-			System.out.println("itemexcp caught in parseItem");
-			throw new ItemListException();
-		}	finally	{ 
-			
-			//	TODO ~ this does not handle errors right at all
-			//	https://stackoverflow.com/questions/7219963/return-a-value-and-throw-an-exception
-			
-			//	If this method doesn't return, i.e. due to an ItemListException
-			//	being thrown by a lower level parser, it results in a lot of
-			//	NullPointerExceptions. As such, the only way I can think to
-			//	handle this is to use a finally branch to force the method to
-			//	return no matter what.
-			return currentItem;
-		}
+		//	Parse itemName
+		currentItem.setName(parseName(token));
+		//	Parse Quantity
+		currentItem.setQuan(parseQuan(token));	
+		//	Parse BestBefore
+		currentItem.setDate(parseBestBefore(token));
+		//	Parse Category
+		currentItem.setCat(parseCategory(token)); 
+
+		//	This return should be safe. If parsing has failed for any of the
+		//	above aspects, those aspects will be set to null, which is equivalent
+		//	to their initialization state anyway.
+		return currentItem;
 		
 	}
 	
@@ -99,7 +131,7 @@ public class Parser	{
 	 * @param token is any string, ideally representing an item name.
 	 * @return the name of the item.
 	 */
-	private String parseName(Scanner token) throws ItemListException	{
+	private String parseName(Scanner token)	{
 		if	(token.hasNext()) {
 			String retVal = token.next();
 			//	Evaluate whether the next token is ',' and thus meets the
@@ -109,9 +141,9 @@ public class Parser	{
 				return retVal;
 			}	
 		}
-		System.out.println("exception");
 		//	Tokens do not conform to grammar rules.
-		throw new ItemListException();
+		if	(this.errorStatus == "nE")	this.errorStatus = "pN";
+		return "null";
 		
 	}
 	
@@ -123,7 +155,7 @@ public class Parser	{
 	 * @return a quantity object, constructed according to the prefix token
 	 * and the volume token.
 	 */
-	private Quantity parseQuan(Scanner token) throws ItemListException	{
+	private Quantity parseQuan(Scanner token)	{
 		if	(token.hasNext("KG") || token.hasNext("L"))	{
 			String pref = token.next();
 			if	(token.hasNextDouble())	{
@@ -137,9 +169,10 @@ public class Parser	{
 						new LiquidQuan(value);
 				}	
 			}
-		}	
+		}
 		//	Tokens do not conform to grammar rules.
-		throw new ItemListException();
+		if	(this.errorStatus == "nE")	this.errorStatus = "pQ";
+		return null;
 	}
 	
 	/**
@@ -150,7 +183,7 @@ public class Parser	{
 	 * before.
 	 * @return a java date object, indicating the Best before date of the item.
 	 */
-	private LocalDate parseBestBefore(Scanner token)	throws ItemListException	{
+	private LocalDate parseBestBefore(Scanner token)	{
 		if	(token.hasNextInt()) {
 			//	Gets DD
 			int day = token.nextInt();
@@ -168,7 +201,8 @@ public class Parser	{
 			}
 		}
 		//	Tokens do not conform to grammar rules.
-		throw new ItemListException();
+		if	(this.errorStatus == "nE")	this.errorStatus = "pBB";
+		return null;
 	}
 	
 	/**
@@ -179,7 +213,7 @@ public class Parser	{
 	 * names are user defined.
 	 * @return the category name.
 	 */
-	private String parseCategory(Scanner token)	throws ItemListException	{
+	private String parseCategory(Scanner token)	{
 		if (token.hasNext()) {
 			String catName = token.next();
 			if	(token.hasNext(";"))	{
@@ -188,7 +222,21 @@ public class Parser	{
 			}
 		}
 		//	Tokens do not conform to grammar rules.
-		throw new ItemListException();
+		if	(this.errorStatus == "nE")	this.errorStatus = "pC";
+		return "null";
+	}
+	
+	/**
+	 * getErrorCode is a getter method for determining the point at which the
+	 * parser failed EARLIEST.
+	 * 
+	 * @return "nE" - no Error; "pN" - name parser; "pQ" - quantity parser;
+	 * "pBB" - best before parser; "pC" - category parser; "eS" - empty scanner.
+	 * eS is only returnable if there was no tokens supplied by the file, i.e. 
+	 * an empty file.
+	 */
+	public String getErrorCode()	{
+		return this.errorStatus;
 	}
 	
 	//	SubClasses of ItemProgramNode, used for generating the paser tree
@@ -227,7 +275,7 @@ public class Parser	{
 		}
 	}
 	
-	class ItemNode	{
+	public class ItemNode	{
 		
 		private String itemName = "null";
 		private Quantity amount = null;
@@ -295,9 +343,77 @@ public class Parser	{
 		
 		@Override
 		public String toString()	{
-			return this.itemName + ", " + this.amount.toString() + 
+			return this.itemName + ", " + this.amount.toString() + ", " +
 					this.bestBefore.getDayOfMonth() + " " + this.bestBefore.getMonthValue() +
 					" " + this.bestBefore.getYear() + ", " + this.category + "; ";
 		}
+		
+		/**
+		 * Boolean method for determining if this item was the result of parser
+		 * error and therefore invalid.
+		 * 
+		 * @return true; this item isn't valid, false; this item is valid.
+		 */
+		public boolean isNull()	{
+			if	(this.itemName == "null" || this.category == "null"
+				|| this.amount == null   || this.bestBefore == null)	return true;
+			else	return false;
+		}
+
+		/**
+		 * Eclipse generated method for hashcode handling.
+		 * 
+		 * @return enclosing parser instance information.
+		 */
+		private Parser getEnclosingInstance() {
+			return Parser.this;
+		}
+		
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + getEnclosingInstance().hashCode();
+			result = prime * result + ((amount == null) ? 0 : amount.hashCode());
+			result = prime * result + ((bestBefore == null) ? 0 : bestBefore.hashCode());
+			result = prime * result + ((category == null) ? 0 : category.hashCode());
+			result = prime * result + ((itemName == null) ? 0 : itemName.hashCode());
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			ItemNode other = (ItemNode) obj;
+			if (!getEnclosingInstance().equals(other.getEnclosingInstance()))
+				return false;
+			if (amount == null) {
+				if (other.amount != null)
+					return false;
+			} else if (!amount.equals(other.amount))
+				return false;
+			if (bestBefore == null) {
+				if (other.bestBefore != null)
+					return false;
+			} else if (!bestBefore.equals(other.bestBefore))
+				return false;
+			if (category == null) {
+				if (other.category != null)
+					return false;
+			} else if (!category.equals(other.category))
+				return false;
+			if (itemName == null) {
+				if (other.itemName != null)
+					return false;
+			} else if (!itemName.equals(other.itemName))
+				return false;
+			return true;
+		}
+
 	}
 }

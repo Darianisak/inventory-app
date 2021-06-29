@@ -113,7 +113,6 @@ public abstract class GUI {
 	 */
 	public GUI() {initialise();}
 
-	@SuppressWarnings("serial")
 	private void initialise() {
 
 		//	Initializes the buttons and their respective action listeners, but

@@ -102,9 +102,7 @@ public class Pantry_Sorter extends GUI{
 			this.itemTree = this.parseObj.topLevelParser(items);
 		}	catch	(FileNotFoundException e)	{
 			//	Scanner error
-		}	catch	(ItemListException e)	{
-			//	Grammar error/ Parser error
-		}
+		}	
 		
 		this.itemAdjList = new HashMap<String, ItemNode>();
 		//	TODO this is crap, the above call needs a try catch for runtimes
@@ -115,10 +113,16 @@ public class Pantry_Sorter extends GUI{
 		//		+ " items loaded.\n If this number is zero, the file was empty.");
 	}
 	
+	/**
+	 * 
+	 */
 	private void computeAdjList()	{
 		
 	}
 	
+	/**
+	 * 
+	 */
 	private void computeCatAdj()	{
 		
 	}
