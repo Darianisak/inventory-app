@@ -31,7 +31,7 @@ public class LiquidQuan implements Quantity	{
 	
 	@Override
 	public String toString()	{
-		return prefix + " " + amount + ", ";
+		return prefix + " " + amount;
 	}
 	
 	@Override

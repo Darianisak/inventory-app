@@ -23,5 +23,4 @@ public interface Quantity {
 	 * @return the Double representation of the stored weight for this object.
 	 */
 	public Double getAmount();
-
 }

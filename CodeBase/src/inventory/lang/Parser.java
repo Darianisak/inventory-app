@@ -132,7 +132,7 @@ public class Parser	{
 	 * @return the name of the item.
 	 */
 	private String parseName(Scanner token)	{
-		if	(token.hasNext()) {
+		if	(token.hasNext() && !token.hasNext("null")) {
 			String retVal = token.next();
 			//	Evaluate whether the next token is ',' and thus meets the
 			//	grammar.
@@ -214,7 +214,7 @@ public class Parser	{
 	 * @return the category name.
 	 */
 	private String parseCategory(Scanner token)	{
-		if (token.hasNext()) {
+		if (token.hasNext() && !token.hasNext("null")) {
 			String catName = token.next();
 			if	(token.hasNext(";"))	{
 				token.next();
