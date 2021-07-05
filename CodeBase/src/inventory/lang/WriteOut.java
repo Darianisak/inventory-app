@@ -23,6 +23,7 @@ public class WriteOut {
 	 * This implementation must use unique file names as it cannot overwrite.
 	 */
 	public void mainWrite(ItemProgramNode toWrite, String fileName) {
+		if	(fileName == "")	fileName = "$01";
 		File temp = createNew(fileName);
 		if	(temp != null)	{
 			//	Branch where no errors were signalled during the operation of
@@ -95,16 +96,28 @@ public class WriteOut {
 				return;
 			}
 			String validationCode = validation.getErrorCode();
-			if	(validationCode != this.errorStatus)	{
-				//	If this branch is enetered, it means that a parser error
+			
+			if	(validationCode != this.errorStatus && validationCode != "eS")	{					
+				//	If this branch is entered, it means that a parser error
 				//	has occured, in which case the output file will not be
 				//	valid. As such, the dest file may as well be deleted.
+				
+				//	In theory, this branch should never be entered, which is
+				//	why I don't test for it. This is because the input of this
+				//	class is always assumed to be safe; a tree can not be
+				//	submitted for saving without first having been verified as
+				//	without parser errors.
+				
 				this.errorStatus = validationCode;
 				if	(dest.delete())	return;
 				else	throw new RuntimeException("Failure to delete invalid"
 						+ " file in WriteOut.writer()");
+			}	else	{
+				//	If this branch is entered, than there should be no problems
+				//	though code assignment is still performed incase of eS / nE
+				this.errorStatus = validationCode;
+				return;
 			}
-			return;
 		}	catch	(IOException e)	{
 			//	Branch where file writing failed due to an IOException being
 			//	thrown. "fW" ~ file write error.

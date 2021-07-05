@@ -155,6 +155,8 @@ public abstract class GUI {
 		searchButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ev) {
 				eventStack.push("SEARCH");
+				onAction(eventStack, getSearchBox().getText());
+				redraw();
 			}
 		});
 		
@@ -162,6 +164,8 @@ public abstract class GUI {
 		display.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ev)	{
 				eventStack.push("DISPLAY");
+				onAction(eventStack);
+				redraw();
 			}
 		});
 
@@ -169,6 +173,8 @@ public abstract class GUI {
 		add.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ev) {
 				eventStack.push("ADD");
+				onAction(eventStack, getSearchBox().getText());
+				redraw();
 			}
 		});
 
@@ -176,6 +182,8 @@ public abstract class GUI {
 		remove.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ev) {
 				eventStack.push("REMOVE");
+				onAction(eventStack, getSearchBox().getText());
+				redraw();
 			}
 		});
 

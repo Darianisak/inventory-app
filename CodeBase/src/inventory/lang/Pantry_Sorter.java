@@ -18,7 +18,6 @@ public class Pantry_Sorter extends GUI{
 	private ActionClass actionObj = new ActionClass();
 	private Parser parseObj = new Parser();
 	private WriteOut writeObj = new WriteOut();
-	private String tempFileName = "01";
 	
 	private ItemProgramNode itemTree = null;
 	private HashMap<String, ArrayList<ItemNode>> itemAdjList = 
@@ -37,6 +36,9 @@ public class Pantry_Sorter extends GUI{
 	protected void onAction(Stack<String> events, String input) {
 		//	Method used for "active" buttons
 		String buttonPressed = "";
+		
+		System.out.println("onAction active");
+		
 		try	{
 			//	Validates that the eventStack actually had a button press recorded
 			buttonPressed = stackCheck(events);
@@ -69,6 +71,7 @@ public class Pantry_Sorter extends GUI{
 	protected void onAction(Stack<String> events)	{
 		//	Method for "Static" button related actions
 		String buttonPressed = "";
+		System.out.println("Start of onAction static");
 		try	{
 			//	Validates that the eventStack actually had a button press recorded
 			buttonPressed = stackCheck(events);
@@ -77,9 +80,10 @@ public class Pantry_Sorter extends GUI{
 			//	and that the function should cease computation.
 			return;
 		}
+		System.out.println("current bP elem: " + buttonPressed);
 		switch(buttonPressed)	{
 		case "SAVE":
-			this.writeObj.mainWrite(this.itemTree, this.tempFileName);
+			this.writeObj.mainWrite(this.itemTree, getSearchBox().getText());
 			String parseCode = this.writeObj.getErrorCode();
 			if	(parseCode == "nE" || parseCode == "eS")	{
 				reportSuccess("File saving success: " + stringifyCode(parseCode));
@@ -92,10 +96,14 @@ public class Pantry_Sorter extends GUI{
 			//	TODO
 			break;
 		case "DISPLAY":
-			//	TODO ~ Contents of itemList won't be displayed until this button
-			//	is called. Additionally, need to figure out a way of enabling
-			//	the user to scroll through data.
-			break;
+			//	When pressed, the GUI will output the contents of the itemtree
+			//	sub node list. At current, only printing the tree list is
+			//	supported, additionally functionality will be required for the
+			//	two adj list types.
+			System.out.println("pre report");
+			reportItemList(this.itemTree.getItems());
+			System.out.println("pre report");
+			return;
 		default:
 			//	This branch should never be reached, but in case it is, end 
 			//	execution and print event stack
@@ -252,6 +260,19 @@ public class Pantry_Sorter extends GUI{
 		tempList.addAll(former);
 		tempList.add(toAdd);
 		return tempList;
+	}
+	
+	/**
+	 * reportItemList is a setter method for outputing the contents of a
+	 * specified itemlist out to the GUI.
+	 * 
+	 * @param toReport is the ArrayList of ItemNodes to print out.
+	 */
+	public void reportItemList(ArrayList<ItemNode> toReport)	{
+		getTextOutputArea().setForeground(Color.BLUE);
+		for	(int i = toReport.size() - 1 ; i >= 0 ; i--)	{
+			getTextOutputArea().insert(toReport.get(i).toString().concat("\n"), 0);
+		}
 	}
 	
 	/**

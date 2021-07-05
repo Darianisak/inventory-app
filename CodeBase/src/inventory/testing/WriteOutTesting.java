@@ -14,6 +14,15 @@ import inventory.lang.Parser;
 import inventory.lang.ItemProgramNode;
 import inventory.lang.WriteOut;
 
+/**
+ * This testing class is tricky. Simply running JUnit does not verify whether
+ * it is working properly or not, instead you have to run it in coverage mode
+ * and check that all assertions are highlighted green. I'm not sure why this
+ * is the case, but I think it has something to do with file handling.
+ * 
+ * @author darianisak
+ *
+ */
 public class WriteOutTesting {
 
 	@SuppressWarnings("finally")
@@ -62,11 +71,8 @@ public class WriteOutTesting {
 	@SuppressWarnings("finally")
 	@Test
 	public void test03()	{
-		
-		//	TODO fix this mess of a test up
-		
-		
-		//	Tests that writer works as expected.
+		//	Tests that writer works as expected - Valid data with an 
+		//	element full scanner.
 		String testString = "muesli, KG 0.5, 16 5 2023, DryFood;"
 				  + " banana, KG 1.0, 5 1 2021, Fruit; ";
 		
@@ -85,38 +91,42 @@ public class WriteOutTesting {
 			assertEquals("nE", writeObj.getErrorCode());
 			ItemProgramNode validation = ps.topLevelParser(temp);
 			assertEquals(tempTree.getItems().toString(), validation.getItems().toString());
-			temp.delete();
 		}	catch	(FileNotFoundException e)	{
 			throw new RuntimeException();
 		}	finally	{
 			//	Ensures that the files are deleted post the tests/
-			if	(temp.exists())	throw new RuntimeException("Test file deletion failure");
-		}	
+			if	(temp.delete())	return;
+			else	throw new RuntimeException("Test file deletion failure");
+		}			
+	}
+	
+	@SuppressWarnings("finally")
+	@Test
+	public void test04()	{
+		//	Tests that the writer functions as expected - Valid data with an
+		//	empty scanner. Should return error status "eS"
+		String testString = "";
+		Parser ps = new Parser();
+		ItemProgramNode tempTree = null;
+		WriteOut writeObj = new WriteOut();
 		
-		String testStringEmpty = "";
-		fName = "tempTest0302";
-		File temp2 = writeObj.createNew(fName);
+		String fName = "$tempTest0401";
+		File temp = writeObj.createNew(fName);
 		
 		try	{
-		//	Valid data ~ no elements.
-			tempTree = ps.parseInventory(new Scanner(testStringEmpty));
-			writeObj.writer(temp2, tempTree, fName);
-			assertTrue(temp2.exists());
+			//	Valid data ~ scanner without any elements.
+			tempTree = ps.parseInventory(new Scanner(testString));
+			writeObj.writer(temp, tempTree, fName);
+			assertTrue(temp.exists());			
 			assertEquals("eS", writeObj.getErrorCode());
-			ItemProgramNode validation = ps.topLevelParser(temp2);
+			ItemProgramNode validation = ps.topLevelParser(temp);
 			assertEquals(tempTree.getItems().toString(), validation.getItems().toString());
-			temp2.delete();
 		}	catch	(FileNotFoundException e)	{
 			throw new RuntimeException();
 		}	finally	{
-			
+			//	Ensures that the files are deleted post the tests/
+			if	(temp.delete())	return;
+			else	throw new RuntimeException("Test file deletion failure");
 		}
-				
-	}
-	
-	@Test
-	public void test04()	{
-		//	WriteOut class integration test - runs all methods as they would be
-		//	run during a standard operation.
 	}
 }
