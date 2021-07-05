@@ -245,33 +245,14 @@ public class Parser	{
 		
 		private ArrayList<ItemNode> items = new ArrayList<ItemNode>();
 		
-		/**
-		 * getter method for retrieving the children nodes of this ProgramNode.
-		 * Children nodes in this case are individual items, specified by the
-		 * user as being apart of their pantry etc.
-		 * 
-		 * @return an ArrayList of ItemNodes, aka child nodes.
-		 */
+		@Override
 		public ArrayList<ItemNode> getItems()	{
 			return this.items;
 		}
 		
-		/**
-		 * setter method for adding items/nodes to the ArrayList of items.
-		 * 
-		 * @param itemToAdd is a child node of ProgramNode
-		 */
+		@Override
 		public void addItem(ItemNode itemToAdd)	{
 			this.items.add(itemToAdd);
-		}
-		
-		@Override
-		public String toString()	{
-			String output = "";
-			for	(ItemNode item : this.items) {
-				output.concat(item.toString());
-			}
-			return output;
 		}
 	}
 	

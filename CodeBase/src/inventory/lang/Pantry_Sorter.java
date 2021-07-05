@@ -15,8 +15,10 @@ import java.util.Collection;
 
 public class Pantry_Sorter extends GUI{
 
-	private ActionClass actionObject = new ActionClass();
+	private ActionClass actionObj = new ActionClass();
 	private Parser parseObj = new Parser();
+	private WriteOut writeObj = new WriteOut();
+	private String tempFileName = "01";
 	
 	private ItemProgramNode itemTree = null;
 	private HashMap<String, ArrayList<ItemNode>> itemAdjList = 
@@ -77,8 +79,15 @@ public class Pantry_Sorter extends GUI{
 		}
 		switch(buttonPressed)	{
 		case "SAVE":
-			//	TODO
-			break;
+			this.writeObj.mainWrite(this.itemTree, this.tempFileName);
+			String parseCode = this.writeObj.getErrorCode();
+			if	(parseCode == "nE" || parseCode == "eS")	{
+				reportSuccess("File saving success: " + stringifyCode(parseCode));
+				return;
+			}	else	{
+				reportError("File writing failure: " + stringifyCode(parseCode));
+				return;
+			}
 		case "SORT":
 			//	TODO
 			break;
@@ -106,16 +115,24 @@ public class Pantry_Sorter extends GUI{
 			String parseCode = fileToTree.getErrorCode();
 			//	Generates output messages.
 			if	(parseCode == "nE" || parseCode == "eS")	{
+				this.itemTree = tempTree;
 				//	Success branch, could possible have been an empty file.
 				reportSuccess("File loading success: " + stringifyCode(parseCode));
 				//	Call adjacency list methods for pre computation structure
 				//	building. These methods are not called in the case of an
 				//	empty list.
 				if	(parseCode != "eS")	{
-					computeAdjList(this.itemTree.getItems(), this.itemAdjList);
-					
-					this.categoryAdjList = computeCatAdj
-									(this.itemTree.getItems(), this.categoryAdjList);
+					//	If the scanner was not empty, compute the adjacency list
+					//	of itemNames::items.					
+					this.itemAdjList = 
+							computeAdjList(this.itemTree.getItems(), this.itemAdjList);
+					//	If the scanner was not empty, compute the adjacency list
+					//	of categories::items.
+					this.categoryAdjList = 
+							computeCatAdj(this.itemTree.getItems(), this.categoryAdjList);
+				}	else	{
+					//	TODO May be problematic, not sure yet though
+					this.itemTree.getItems().removeAll(null);
 				}
 				return;
 			}	else	{
@@ -147,10 +164,13 @@ public class Pantry_Sorter extends GUI{
 		case "pQ":	return "Error on item quantity!";
 		case "pBB":	return "Error on best before!";
 		case "pC":	return "Error on category!";
+		case "fAE":	return "Filename already exists!";
+		case "fC":	return "File creation error!";
+		case "fNF":	return "File not found!";
 		//	An unsupported error code has been supplied, which means the
 		//	implementation needs to be updated.
 		default:	throw new RuntimeException("Unsupported Error Code provided"
-					+ " by Parser.class.");
+					+ " by Parser.class or WriteOut.class");
 		}
 	}
 	

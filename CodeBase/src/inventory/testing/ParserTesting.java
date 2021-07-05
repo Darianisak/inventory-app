@@ -374,4 +374,12 @@ public class ParserTesting {
 		assertEquals("2020-02-01", valid.getDate().toString());
 		assertEquals("cat", valid.getCat());
 	}
+	
+	@Test
+	public void test10()	{
+		//	Parser class integration test - runs all methods as they would be
+		//	run during a standard operation.
+		
+		//	TODO
+	}
 }
