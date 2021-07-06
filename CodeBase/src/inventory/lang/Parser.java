@@ -396,5 +396,11 @@ public class Parser	{
 			return true;
 		}
 
+		//@Override
+		public Integer compareTo(ItemNode i2) {
+			//	CompareTo implementation for sorting based on best before
+			return this.bestBefore.compareTo(i2.bestBefore);
+		}
+
 	}
 }

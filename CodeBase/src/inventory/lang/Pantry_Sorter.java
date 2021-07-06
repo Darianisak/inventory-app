@@ -15,8 +15,6 @@ import java.util.Collection;
 
 public class Pantry_Sorter extends GUI{
 
-	private ActionClass actionObj = new ActionClass();
-	private Parser parseObj = new Parser();
 	private WriteOut writeObj = new WriteOut();
 	
 	private ItemProgramNode itemTree = null;
@@ -28,6 +26,7 @@ public class Pantry_Sorter extends GUI{
 	/**
 	 * Main function for running the program. As it is an extension of GUI,
 	 * the instantation call calls the super method, thus running the GUI
+	 * 
 	 * @param args is the set of arguments passed in at runtime
 	 */
 	public static void main(String[] args)	{new Pantry_Sorter();}
@@ -35,10 +34,7 @@ public class Pantry_Sorter extends GUI{
 	@Override
 	protected void onAction(Stack<String> events, String input) {
 		//	Method used for "active" buttons
-		String buttonPressed = "";
-		
-		System.out.println("onAction active");
-		
+		String buttonPressed = "";		
 		try	{
 			//	Validates that the eventStack actually had a button press recorded
 			buttonPressed = stackCheck(events);
@@ -48,11 +44,39 @@ public class Pantry_Sorter extends GUI{
 			return;
 		}
 		switch(buttonPressed)	{
+		case "SAVE":
+		//	When save is called, the itemList contained within this.itemTree
+		//	is written out to a file, with the name specified by the query
+		//	field. If no name is supplied than "$01" will be used. This
+		//	method does not support overwriting and as such duplicate file
+		//	names will cause the save process to be aborted with a termination
+		//	message.
+		this.writeObj.mainWrite(this.itemTree, input);
+		String parseCode = this.writeObj.getErrorCode();
+		if	(parseCode == "nE" || parseCode == "eS")	{
+			reportSuccess("File saving success: " + stringifyCode(parseCode));
+			return;
+		}	else	{
+			reportError("File writing failure: " + stringifyCode(parseCode));
+			return;
+		}
 		case "SEARCH":
-			//	TODO
+			//	TODO ~ Needs Trie node for prefix matching
 			break;
 		case "REMOVE":
 			//	TODO
+			ArrayList<ItemNode> temp = new ArrayList<ItemNode>();
+			
+			//	Determines if input was for a category or itemName mapping.
+			temp = this.itemAdjList.get(input);
+			if	(temp == null)	temp = this.categoryAdjList.get(temp);
+			if	(temp == null)	{
+				reportError("The item or category specified was not found.");
+				return;
+			}
+			
+			
+			
 			break;
 		case "ADD":
 			//	TODO
@@ -71,7 +95,6 @@ public class Pantry_Sorter extends GUI{
 	protected void onAction(Stack<String> events)	{
 		//	Method for "Static" button related actions
 		String buttonPressed = "";
-		System.out.println("Start of onAction static");
 		try	{
 			//	Validates that the eventStack actually had a button press recorded
 			buttonPressed = stackCheck(events);
@@ -82,27 +105,20 @@ public class Pantry_Sorter extends GUI{
 		}
 		System.out.println("current bP elem: " + buttonPressed);
 		switch(buttonPressed)	{
-		case "SAVE":
-			this.writeObj.mainWrite(this.itemTree, getSearchBox().getText());
-			String parseCode = this.writeObj.getErrorCode();
-			if	(parseCode == "nE" || parseCode == "eS")	{
-				reportSuccess("File saving success: " + stringifyCode(parseCode));
-				return;
-			}	else	{
-				reportError("File writing failure: " + stringifyCode(parseCode));
-				return;
-			}
 		case "SORT":
-			//	TODO
+			//	When pressed, sort applies date sorting to the entirety of the
+			//	itemTree itemList. By applying sorting to this list, the result
+			//	of the sort can be exported out via the save functionality,
+			//	allowing sorts to be preserved between loads of the application.
+			this.itemTree.getItems().sort((i1, i2) -> i1.compareTo(i2));
+			reportItemList(this.itemTree.getItems());
 			break;
 		case "DISPLAY":
 			//	When pressed, the GUI will output the contents of the itemtree
 			//	sub node list. At current, only printing the tree list is
 			//	supported, additionally functionality will be required for the
 			//	two adj list types.
-			System.out.println("pre report");
 			reportItemList(this.itemTree.getItems());
-			System.out.println("pre report");
 			return;
 		default:
 			//	This branch should never be reached, but in case it is, end 
@@ -269,6 +285,8 @@ public class Pantry_Sorter extends GUI{
 	 * @param toReport is the ArrayList of ItemNodes to print out.
 	 */
 	public void reportItemList(ArrayList<ItemNode> toReport)	{
+		//	Used to clear the display prior to the inventory write.
+		getTextOutputArea().setText(null);
 		getTextOutputArea().setForeground(Color.BLUE);
 		for	(int i = toReport.size() - 1 ; i >= 0 ; i--)	{
 			getTextOutputArea().insert(toReport.get(i).toString().concat("\n"), 0);

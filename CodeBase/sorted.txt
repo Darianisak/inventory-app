@@ -1,0 +1,1 @@
+name1, KG 0.1, 1 2 2020, cat; banana, KG 1.0, 5 1 2021, Fruit; name2, KG 0.2, 2 1 2022, cate; muesli, KG 0.5, 16 5 2023, DryFood; 

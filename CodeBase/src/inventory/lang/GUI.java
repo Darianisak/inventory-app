@@ -191,7 +191,7 @@ public abstract class GUI {
 		save.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ev) {
 				eventStack.push("SAVE");
-				onAction(eventStack);
+				onAction(eventStack, getSearchBox().getText());
 				redraw();
 			}
 		});
