@@ -1,7 +1,6 @@
 package inventory.testing;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.Test;
@@ -138,8 +137,6 @@ public class Pantry_SorterTesting {
 		mainTree = reader.parseInventory(new Scanner(inputMain));
 		secondTree = reader.parseInventory(new Scanner(inputSecond));
 		
-		HashMap<String, ArrayList<ItemNode>> expected = 
-				new HashMap<String, ArrayList<ItemNode>>();
 		HashMap<String, ArrayList<ItemNode>> output = 
 				new HashMap<String, ArrayList<ItemNode>>();
 		HashMap<String, ArrayList<ItemNode>> input = 

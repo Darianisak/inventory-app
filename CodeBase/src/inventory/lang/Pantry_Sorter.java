@@ -7,11 +7,9 @@ import java.util.EmptyStackException;
 import java.util.Stack;
 
 import inventory.lang.Parser.ItemNode;
-import inventory.lang.Parser.ProgramNode;
 
 import java.util.HashMap;
 import java.util.ArrayList;
-import java.util.Collection;
 
 public class Pantry_Sorter extends GUI{
 
@@ -42,7 +40,7 @@ public class Pantry_Sorter extends GUI{
 			//	If this branch is taken, it means that the event stack was empty
 			//	and that the function should cease computation.
 			return;
-		}
+		}		
 		switch(buttonPressed)	{
 		case "SAVE":
 		//	When save is called, the itemList contained within this.itemTree
@@ -64,37 +62,89 @@ public class Pantry_Sorter extends GUI{
 			//	TODO ~ Needs Trie node for prefix matching
 			break;
 		case "REMOVE":
-			//	TODO
-			ArrayList<ItemNode> temp = new ArrayList<ItemNode>();
-			
-			//	Determines if input was for a category or itemName mapping.
-			temp = this.itemAdjList.get(input);
-			if	(temp == null)	temp = this.categoryAdjList.get(temp);
-			if	(temp == null)	{
-				reportError("The item or category specified was not found.");
-				return;
-			}
-			
-			
-			
-			break;
+			//	Remove is done by parsing the contents of the query field into
+			//	an itemTree, and then verifying that the items of that item
+			//	tree are contained within other program data structures. If they
+			//	are found, then remove them. Owing to this implementation using
+			//	the parser as a verification method, multi element deletion is
+			//	supported by default, though be advised that one parser error
+			//	will cause the process to return without removing anything.
+			String toRemove = input;
+			Parser removeParser = new Parser();
+			ItemProgramNode removeTree = null;
+			if	(input != "")	{
+				removeTree = removeParser.parseInventory(new java.util.Scanner(toRemove));
+				if	(removeParser.getErrorCode() ==  "nE")	{
+					//	The input tokens were valid, so check that it is present
+					//	This outer for loop ensures that all elements specified
+					//	for deletion are removed.
+					for	(ItemNode item : removeTree.getItems())	{
+						//	Check that the item is within the itemAdjList, which
+						//	should be the computationally fastest way of verifying.
+						//	If the element is found in the adjlist, it is present
+						//	program wide, so remove accordingly.
+						if	(this.itemAdjList.get(item.getName()).contains(item))	{
+							this.itemTree.getItems().remove(item);
+							this.itemAdjList.get(item.getName()).remove(item);
+							this.categoryAdjList.get(item.getCat()).remove(item);
+						}	else	{
+							reportError("The item: " + item.toString() + " was "
+									+ "not found wihtin the itemAdjList.");
+						}
+					}
+					return;
+				}	else	{
+					//	Branch where the input supplied by the query field did
+					//	not conform to the parsers grammar rules and the process
+					//	was subsequently terminated.
+					reportError("The item specified in the query field did not have"
+							+ " a valid format: itemName, KG/L 0.0, DD MM YYYY, category; "
+							+ "The input failed from error code: " + 
+							stringifyCode(removeParser.getErrorCode()));
+					return;
+				}
+			}	
+			return;
 		case "ADD":
-			//	TODO
-			break;
+			//	Adding is done via parsing a scanner to the parse class, as such
+			//	item nodes are received in ArrayList format. As such, multiple
+			//	item adding is supported by default, IF the user formats their
+			//	input string correctly. Support for empty elements is NOT
+			//	supported.	
+			if	(input == "") return;
+			String toAdd = input;
+			ItemProgramNode addTree = null;
+			Parser addParser = new Parser();
+			addTree = addParser.parseInventory(new java.util.Scanner(toAdd));
+			
+			//	To validate the input, a similiar process to onLoad()'s way of
+			//	validating. There shouldn't
+			if	(addParser.getErrorCode() == "nE")	{
+				for	(ItemNode item : addTree.getItems())
+					this.itemTree.addItem(item);
+				computeAdjList(itemTree.getItems(), this.itemAdjList);
+				computeCatAdj(itemTree.getItems(), this.categoryAdjList);
+				reportItemList(this.itemTree.getItems());
+			}	else	{
+				reportError("The item specified in the query field did not have"
+						+ " a valid format: itemName, KG/L 0.0, DD MM YYYY, category; "
+						+ "The input failed from error code: " + 
+						stringifyCode(addParser.getErrorCode()));
+			}
+			return;
 		default:
 			//	This branch should never be reached, but in case it is, end 
 			//	execution and print event stack
 			reportError(buttonPressed + " does not match a case required by the"
-					+ " 'Static' variant of onAction().\n" + events.toString());
+					+ " 'Active' variant of onAction().\n" + events.toString());
 			throw new RuntimeException();
-		}
-		
+		}	
 	}
 	
 	@Override
 	protected void onAction(Stack<String> events)	{
 		//	Method for "Static" button related actions
-		String buttonPressed = "";
+		String buttonPressed = "";	
 		try	{
 			//	Validates that the eventStack actually had a button press recorded
 			buttonPressed = stackCheck(events);
@@ -103,7 +153,6 @@ public class Pantry_Sorter extends GUI{
 			//	and that the function should cease computation.
 			return;
 		}
-		System.out.println("current bP elem: " + buttonPressed);
 		switch(buttonPressed)	{
 		case "SORT":
 			//	When pressed, sort applies date sorting to the entirety of the
