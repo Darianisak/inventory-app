@@ -20,6 +20,7 @@ public class Pantry_Sorter extends GUI{
 			new HashMap<String, ArrayList<ItemNode>>();
 	private HashMap<String, ArrayList<ItemNode>> categoryAdjList = 
 			new HashMap<String, ArrayList<ItemNode>>();
+	private PrefixSearch searchTree = null;
 	
 	/**
 	 * Main function for running the program. As it is an extension of GUI,
@@ -203,6 +204,15 @@ public class Pantry_Sorter extends GUI{
 					//	of categories::items.
 					this.categoryAdjList = 
 							computeCatAdj(this.itemTree.getItems(), this.categoryAdjList);
+					
+					//	TODO ~ trie testing
+					System.out.println("pre trie gen");
+					generateSearchTree();
+					System.out.println("post trie gen");
+					
+					
+					
+					
 				}	else	{
 					//	TODO May be problematic, not sure yet though
 					this.itemTree.getItems().removeAll(null);
@@ -219,6 +229,16 @@ public class Pantry_Sorter extends GUI{
 			//	Return out of the process to prevent tree assignment of a faulty
 			//	file.
 			return;
+		}
+	}
+	
+	public void generateSearchTree()	{
+		PrefixSearch prefTree = new PrefixSearch();
+		//	for each item in itemTree, add to prefTree ~ if no error code, assign to priv
+		//	else return with error report
+		for	(ItemNode item : this.itemTree.getItems())	{
+			String toAdd = item.toString();
+			prefTree.addToTree(item.toString(), item);
 		}
 	}
 	
