@@ -61,6 +61,8 @@ public class Pantry_Sorter extends GUI{
 		}
 		case "SEARCH":
 			//	TODO ~ Needs Trie node for prefix matching
+			//	Build phase, not a final implement
+			generateSearchTree();
 			break;
 		case "REMOVE":
 			//	Remove is done by parsing the contents of the query field into
@@ -204,15 +206,6 @@ public class Pantry_Sorter extends GUI{
 					//	of categories::items.
 					this.categoryAdjList = 
 							computeCatAdj(this.itemTree.getItems(), this.categoryAdjList);
-					
-					//	TODO ~ trie testing
-					System.out.println("pre trie gen");
-					generateSearchTree();
-					System.out.println("post trie gen");
-					
-					
-					
-					
 				}	else	{
 					//	TODO May be problematic, not sure yet though
 					this.itemTree.getItems().removeAll(null);
@@ -236,10 +229,11 @@ public class Pantry_Sorter extends GUI{
 		PrefixSearch prefTree = new PrefixSearch();
 		//	for each item in itemTree, add to prefTree ~ if no error code, assign to priv
 		//	else return with error report
-		for	(ItemNode item : this.itemTree.getItems())	{
-			String toAdd = item.toString();
-			prefTree.addToTree(item.toString(), item);
-		}
+		
+		
+		//	TODO ~ this is in testing config right now
+		prefTree.addItem("This is a test", this.itemTree.getItems().get(0));
+		System.out.println("Node found: " + prefTree.search("This is a test").toString());
 	}
 	
 	/**
