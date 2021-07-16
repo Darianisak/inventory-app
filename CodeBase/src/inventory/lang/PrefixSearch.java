@@ -59,19 +59,48 @@ public class PrefixSearch {
 			}
 		}
 		if	(current.completeItem)	{
-			//	Branch where the node was found at the end of the search tree,
-			//	so return the found item node.
+			//	Explicit search path:	This branch is taken when toFind is
+			//	equal to the full toString of an element, and thus, just
+			//	return the found item as an ArrayList with 1 item.
+			
+			System.out.println("reached complete branch");
+			
 			returnList.add(itemAtNode);
-			if	(!current.children.isEmpty())	{
-				//	TODO
-			}
+			return returnList;
 		}	else	{
-			//	Branch where the node was not found at the end of the search
-			//	term. This means there may be a search error, or the node is
-			//	not contained within the search tree.
-			this.errorStatus = "sI";
-			return null;
+			
+			System.out.println("reached pref branch");
+			
+			returnList.addAll(deeperSearch(current));
+			return returnList;
 		}
+	}
+	
+	private ArrayList<ItemNode> deeperSearch(PrefixSearch branch)	{
+		if	(branch == null) return null;
+		ArrayList<ItemNode> returnList = new ArrayList<ItemNode>();
+		for	(Character term : branch.children.keySet())	{
+			
+			System.out.println("term of for: " + term);
+			
+			if	(branch.children.get(term).completeItem) {
+				//	End state branch where nodes are added recursively to the
+				//	search results.
+				returnList.add(branch.children.get(term).itemAtNode);
+				return returnList;
+			}	else	{
+				
+				System.out.println("has gone into else bracnh");
+				
+				//	Branch where recursive call is made to traverse down the
+				//	children tree to get all search nodes.
+				returnList.addAll(deeperSearch(branch.children.get(term)));
+				return returnList;
+			}
+		}
+		//	Branch where a major error has occurred : TODO write better javadoc here
+		this.errorStatus = "sI";
+		return null;
 	}
 
 	/**

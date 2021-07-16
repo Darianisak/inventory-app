@@ -62,7 +62,11 @@ public class Pantry_Sorter extends GUI{
 		case "SEARCH":
 			//	TODO ~ Needs Trie node for prefix matching
 			//	Build phase, not a final implement
-			generateSearchTree();
+			ArrayList<ItemNode> retList = new ArrayList<ItemNode>();
+			retList = this.searchTree.search(input);
+			System.out.println("search outcome: " + retList.toString());
+			
+			
 			break;
 		case "REMOVE":
 			//	Remove is done by parsing the contents of the query field into
@@ -206,6 +210,11 @@ public class Pantry_Sorter extends GUI{
 					//	of categories::items.
 					this.categoryAdjList = 
 							computeCatAdj(this.itemTree.getItems(), this.categoryAdjList);
+					
+					//	TODO ~ integrate this better or something
+					generateSearchTree();
+					
+					
 				}	else	{
 					//	TODO May be problematic, not sure yet though
 					this.itemTree.getItems().removeAll(null);
@@ -232,8 +241,13 @@ public class Pantry_Sorter extends GUI{
 		
 		
 		//	TODO ~ this is in testing config right now
-		prefTree.addItem("This is a test", this.itemTree.getItems().get(0));
-		System.out.println("Node found: " + prefTree.search("This is a test").toString());
+		for	(ItemNode item : this.itemTree.getItems())	{
+			prefTree.addItem(item.toString(), item);
+		}
+		
+		this.searchTree = prefTree;
+		
+		System.out.println("tree generation finished.");
 	}
 	
 	/**
